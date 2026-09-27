@@ -1,59 +1,71 @@
-# PollApp
+# Poll App
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.19.
+Poll App is a responsive Angular project for creating, answering and reviewing surveys.
+The app uses Supabase as a backend and stores surveys and submitted votes without user
+authentication.
 
-## Development server
+## Features
 
-To start a local development server, run:
+- Create surveys with title, description, category, deadline and dynamic questions
+- Add single-choice and multiple-choice questions
+- Limit answer options to six per question
+- Answer active surveys
+- Display survey results with percentage bars
+- Update results through Supabase realtime subscriptions
+- Filter surveys by category
+- Show active and past surveys separately
+- Responsive layout for desktop, tablet and mobile views
 
-```bash
-ng serve
-```
+## Tech Stack
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- Angular
+- TypeScript
+- SCSS
+- Supabase
+- Reactive Forms
 
-## Code scaffolding
+## Project Setup
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
+Install the dependencies:
 
 ```bash
-ng build
+npm install
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+Start the local development server:
 
 ```bash
-ng test
+npm start
 ```
 
-## Running end-to-end tests
+Open the app in the browser:
 
-For end-to-end (e2e) testing, run:
+```text
+http://localhost:4200/
+```
+
+## Build
+
+Create a production build:
 
 ```bash
-ng e2e
+npm run build
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+The build output is created in the `dist/` folder.
 
-## Additional Resources
+## Supabase
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+The app expects two Supabase tables:
+
+- `surveys`
+- `votes`
+
+The public Supabase URL and anon key are configured in:
+
+```text
+src/environments/environment.ts
+```
+
+The anon key is intended for frontend usage. A Supabase service role key must never be
+committed to this project.
