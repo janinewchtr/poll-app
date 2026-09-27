@@ -1,0 +1,151 @@
+<main class="survey-detail-page">
+  <header class="detail-header">
+    <a routerLink="/" aria-label="Go to home">
+      <img class="detail-header__logo" src="/assets/pollapp_logo_darkpruple.svg" alt="Poll App" />
+    </a>
+
+    <button type="button" class="primary-button" (click)="openCreateSurveyModal()">
+      Create survey
+    </button>
+  </header>
+
+  @if (isLoading()) {
+    <p class="state-message">Loading survey...</p>
+  } @else if (errorMessage() && !survey()) {
+    <p class="state-message state-message--error">
+      {{ errorMessage() }}
+    </p>
+  } @else if (survey(); as currentSurvey) {
+    <section class="detail-layout">
+      <article class="survey-card">
+        <div class="survey-card__meta">
+          <div>
+            <span class="status-badge">
+              {{ surveyStatusLabel() }}
+            </span>
+
+            <p>Ends on {{ formatDeadline(currentSurvey.deadline) }}</p>
+          </div>
+
+          <p>Category: {{ currentSurvey.category }}</p>
+        </div>
+
+        <h1>{{ currentSurvey.title }}</h1>
+
+        @if (currentSurvey.description) {
+          <p class="survey-card__description">
+            {{ currentSurvey.description }}
+          </p>
+        }
+
+        @if (questions().length > 0) {
+          <form class="question-grid">
+            @for (question of questions(); track question.id; let questionIndex = $index) {
+              <fieldset class="question-card">
+                <legend>{{ questionIndex + 1 }}. {{ question.text }}</legend>
+
+                @if (question.allowMultiple) {
+                  <p>More than one answers are possible.</p>
+                } @else {
+                  <p>Choose one answer.</p>
+                }
+
+                <div class="answer-list">
+                  @for (option of question.options; track option.id) {
+                    <label class="answer-option">
+                      <input
+                        [type]="question.allowMultiple ? 'checkbox' : 'radio'"
+                        [name]="question.id"
+                        [checked]="isOptionSelected(question.id, option.id)"
+                        [disabled]="isPastSurvey() || isSubmitting()"
+                        (change)="handleAnswerChange(question, option.id, $event)"
+                      />
+
+                      <span>{{ option.text }}</span>
+                    </label>
+                  }
+                </div>
+              </fieldset>
+            }
+          </form>
+        } @else {
+          <p class="state-message">No questions found for this survey.</p>
+        }
+
+        @if (errorMessage()) {
+          <p class="submit-message submit-message--error">
+            {{ errorMessage() }}
+          </p>
+        }
+
+        @if (successMessage()) {
+          <p class="submit-message">
+            {{ successMessage() }}
+          </p>
+        }
+
+        <button
+          type="button"
+          class="complete-button"
+          [disabled]="!canSubmitSurvey()"
+          (click)="submitVote()"
+        >
+          @if (isSubmitting()) {
+            Submitting...
+          } @else {
+            Complete survey
+          }
+        </button>
+      </article>
+
+      <aside class="results-panel">
+        <h2>
+          Survey results
+          <span>LIVE</span>
+        </h2>
+
+        @if (hasVotes()) {
+          <div class="results-list">
+            @for (question of questions(); track question.id; let questionIndex = $index) {
+              <section class="result-question">
+                <h3>{{ questionIndex + 1 }}. {{ question.text }}</h3>
+
+                <div class="result-options">
+                  @for (option of question.options; track option.id; let optionIndex = $index) {
+                    <div class="result-row">
+                      <span class="result-row__label">
+                        {{ getOptionLabel(optionIndex) }}
+                      </span>
+
+                      <div class="result-row__track">
+                        <span
+                          class="result-row__fill"
+                          [style.width.%]="getVotePercentage(question.id, option.id)"
+                        ></span>
+                      </div>
+
+                      <span class="result-row__percent">
+                        {{ getVotePercentage(question.id, option.id) }}%
+                      </span>
+                    </div>
+                  }
+                </div>
+              </section>
+            }
+          </div>
+        } @else {
+          <p>Results will be shown here after participants complete the survey.</p>
+
+          <strong>There are no answers yet.</strong>
+        }
+      </aside>
+    </section>
+  }
+
+  @if (isCreateSurveyModalOpen()) {
+    <app-create-survey-modal
+      (closeModal)="closeCreateSurveyModal()"
+      (surveyCreated)="handleSurveyCreated($event)"
+    />
+  }
+</main>

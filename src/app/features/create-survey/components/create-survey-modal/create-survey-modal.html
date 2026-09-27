@@ -1,0 +1,232 @@
+<div class="modal-backdrop" role="presentation" (click)="close()"></div>
+
+@if (!showPublishedOverlay()) {
+  <section
+    class="create-survey-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="create-survey-title"
+  >
+    <header class="modal-header">
+      <div>
+        <span class="status-badge">Draft</span>
+        <h2 id="create-survey-title">Create new survey</h2>
+      </div>
+
+      <button
+        type="button"
+        class="close-button"
+        aria-label="Close create survey modal"
+        (click)="close()"
+      >
+        Cancel
+        <span aria-hidden="true">×</span>
+      </button>
+    </header>
+
+    <form class="survey-form" [formGroup]="form" (ngSubmit)="submitSurvey()">
+      <div class="form-panel">
+        <section class="survey-basics">
+          <div class="survey-basics__left">
+            <label class="form-field form-field--name">
+              <span>Survey name</span>
+
+              <div class="field-with-icon">
+                <input type="text" formControlName="title" />
+
+                <button
+                  type="button"
+                  class="icon-button"
+                  aria-label="Clear survey name"
+                  (click)="form.controls.title.setValue('')"
+                >
+                  <img src="/assets/delete-white.svg" alt="" />
+                </button>
+              </div>
+
+              @if (form.controls.title.touched && form.controls.title.invalid) {
+                <small>Survey name is required.</small>
+              }
+            </label>
+
+            <div class="survey-basics__row">
+              <label class="form-field form-field--date">
+                <span>Set end date <em>(optional)</em></span>
+
+                <div class="field-with-icon">
+                  <input type="date" formControlName="deadline" />
+
+                  <button
+                    type="button"
+                    class="icon-button"
+                    aria-label="Clear deadline"
+                    (click)="form.controls.deadline.setValue('')"
+                  >
+                    <img src="/assets/delete-white.svg" alt="" />
+                  </button>
+                </div>
+              </label>
+
+              <div class="form-field form-field--category">
+                <span>Choose category</span>
+
+                <div class="create-category-filter">
+                  <button
+                    type="button"
+                    class="create-category-filter__trigger"
+                    [class.is-open]="isCategoryMenuOpen()"
+                    [class.has-selection]="selectedCategory()"
+                    [attr.aria-expanded]="isCategoryMenuOpen()"
+                    aria-haspopup="listbox"
+                    (click)="toggleCategoryMenu($event)"
+                  >
+                    <span>{{ selectedCategoryLabel() }}</span>
+                    <img src="/assets/arrow_drop_down_orange.svg" alt="" />
+                  </button>
+
+                  @if (isCategoryMenuOpen()) {
+                    <ul class="create-category-filter__menu" role="listbox">
+                      @for (category of categories; track category) {
+                        <li>
+                          <button
+                            type="button"
+                            [class.is-selected]="selectedCategory() === category"
+                            (click)="selectCategory(category, $event)"
+                          >
+                            {{ category }}
+                          </button>
+                        </li>
+                      }
+                    </ul>
+                  }
+                </div>
+
+                @if (form.controls.category.touched && form.controls.category.invalid) {
+                  <small>Category is required.</small>
+                }
+              </div>
+            </div>
+          </div>
+
+          <label class="form-field form-field--description">
+            <span>Describing text <em>(optional)</em></span>
+
+            <div class="field-with-icon">
+              <textarea formControlName="description" rows="4"></textarea>
+
+              <button
+                type="button"
+                class="icon-button"
+                aria-label="Clear description"
+                (click)="form.controls.description.setValue('')"
+              >
+                <img src="/assets/delete-white.svg" alt="" />
+              </button>
+            </div>
+          </label>
+        </section>
+
+        <section class="questions-editor" formArrayName="questions">
+          @for (question of questions().controls; track question; let questionIndex = $index) {
+            <fieldset class="question-editor" [formGroupName]="questionIndex">
+              <div class="question-editor__header">
+                <legend>{{ questionIndex + 1 }}. Question</legend>
+
+                <button
+                  type="button"
+                  class="icon-button"
+                  aria-label="Delete question"
+                  [disabled]="questions().length === 1"
+                  (click)="removeQuestion(questionIndex)"
+                >
+                  <img src="/assets/delete-white.svg" alt="" />
+                </button>
+              </div>
+
+              <label class="form-field">
+                <input type="text" formControlName="text" />
+
+                @if (question.controls.text.touched && question.controls.text.invalid) {
+                  <small>Question is required.</small>
+                }
+              </label>
+
+              <div class="answers-heading">
+                <span>Answers</span>
+
+                <label class="checkbox-field">
+                  <input type="checkbox" formControlName="allowMultiple" />
+                  <span>Allow multiple answers.</span>
+                </label>
+              </div>
+
+              <div class="answers-editor" formArrayName="options">
+                @for (
+                  option of getOptions(questionIndex).controls;
+                  track option;
+                  let optionIndex = $index
+                ) {
+                  <div class="answer-row">
+                    <span>{{ getAnswerLetter(optionIndex) }}.</span>
+
+                    <input type="text" [formControlName]="optionIndex" />
+
+                    <button
+                      type="button"
+                      class="icon-button"
+                      aria-label="Delete answer"
+                      [disabled]="getOptions(questionIndex).length <= 2"
+                      (click)="removeOption(questionIndex, optionIndex)"
+                    >
+                      <img src="/assets/delete-white.svg" alt="" />
+                    </button>
+                  </div>
+
+                  @if (option.touched && option.invalid) {
+                    <small class="answer-error">Answer is required.</small>
+                  }
+                }
+
+                @if (canAddOption(questionIndex)) {
+                  <button type="button" class="tertiary-button" (click)="addOption(questionIndex)">
+                    Add answer
+                    <img src="/assets/add_circle_white.svg" alt="" />
+                  </button>
+                }
+              </div>
+            </fieldset>
+          }
+
+          <button type="button" class="add-question-button" (click)="addQuestion()">
+            Add next question
+            <img src="/assets/add_circle_white.svg" alt="" />
+          </button>
+        </section>
+      </div>
+
+      <div class="modal-actions">
+        @if (submitError()) {
+          <p>{{ submitError() }}</p>
+        }
+
+        <button type="submit" class="publish-button" [disabled]="isSubmitting()">
+          @if (isSubmitting()) {
+            Publishing...
+          } @else {
+            Publish
+          }
+        </button>
+      </div>
+    </form>
+  </section>
+}
+
+@if (showPublishedOverlay()) {
+  <section class="published-overlay" role="dialog" aria-modal="true" aria-label="Survey published">
+    <p>Your survey is now published</p>
+
+    <button type="button" aria-label="Go to created survey" (click)="closePublishedOverlay()">
+      ×
+    </button>
+  </section>
+}

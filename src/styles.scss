@@ -1,0 +1,93 @@
+@font-face {
+  font-family: 'Mulish';
+  src: url('/assets/Mulish-VariableFont_wght.ttf') format('truetype');
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Nerko One';
+  src: url('/assets/NerkoOne-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --color-primary-purple: #35273a;
+  --color-primary-orange: #ffb770;
+  --color-secondary-orange: #ffcfa1;
+  --color-secondary-orange-hover: rgba(255, 207, 161, 0.6);
+
+  --color-bg-app: #35273a;
+  --color-bg-card: #faf5fe;
+  --color-bg-panel-dark: rgba(217, 217, 217, 0.08);
+  --color-bg-survey: rgba(142, 112, 153, 0.1);
+
+  --color-text-light: #ffffff;
+  --color-text-dark: #35273a;
+  --color-text-muted: #35273a;
+
+  --color-checkbox-border: #35273a;
+  --color-checkbox-checked: #ffb770;
+
+  --color-result-track: #ededed;
+  --color-result-fill: #ffb770;
+
+  --color-overlay: rgba(53, 39, 58, 0.72);
+  --shadow-default: 3px 3px 3.2px rgba(0, 0, 0, 0.25);
+
+  --scrollbar-width: 8px;
+  --scrollbar-radius: 10px;
+  --scrollbar-thumb: #ffb770;
+  --scrollbar-track: #b8b8b8;
+
+  --font-family-display: 'Nerko One', cursive;
+  --font-family-base: 'Mulish', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: var(--color-bg-app);
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  color: var(--color-text-light);
+  font-family: var(--font-family-base);
+  background: var(--color-bg-app);
+}
+
+input,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+::-webkit-scrollbar {
+  width: var(--scrollbar-width);
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: var(--scrollbar-radius);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: var(--scrollbar-radius);
+}

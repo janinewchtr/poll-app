@@ -1,0 +1,136 @@
+<main class="home-page">
+  <section class="hero">
+    <img class="hero__logo" src="/assets/pollapp_logo_orange.svg" alt="Poll App" />
+
+    <div class="hero__content">
+      <div class="hero__text">
+        <h1>Collect Feedback, Unlock Ideas</h1>
+
+        <p>
+          Create and share surveys in minutes - from team events to workplace culture. Collect
+          opinions, engage your audience, and turn feedback into action.
+        </p>
+
+        <button type="button" class="primary-button" (click)="openCreateSurveyModal()">
+          New survey
+        </button>
+      </div>
+
+      <div class="hero-visual" aria-hidden="true">
+        <img class="hero-visual__phone" src="/assets/animation_picture.png" alt="" />
+
+        <img class="hero-visual__bubble" src="/assets/animation_typing_bubble.svg" alt="" />
+
+        <img class="hero-visual__question" src="/assets/animation_Question_mark.svg" alt="" />
+
+        <img class="hero-visual__star" src="/assets/animation_star.svg" alt="" />
+
+        <img class="hero-visual__check" src="/assets/animation_check-2.svg" alt="" />
+      </div>
+    </div>
+  </section>
+
+  <section class="surveys">
+    <h2>Your surveys</h2>
+
+    @if (isLoading()) {
+      <p class="state-message">Loading surveys...</p>
+    } @else if (errorMessage()) {
+      <p class="state-message state-message--error">
+        {{ errorMessage() }}
+      </p>
+    } @else {
+      @if (endingSoonSurveys().length > 0) {
+        <section class="ending-soon">
+          <h3>Ending soon surveys</h3>
+
+          <div class="highlight-grid">
+            @for (survey of endingSoonSurveys(); track survey.id) {
+              <a class="highlight-card" [routerLink]="['/surveys', survey.id]">
+                <span>{{ survey.category }}</span>
+                <strong>{{ survey.title }}</strong>
+                <small>{{ getDeadlineBadge(survey) }}</small>
+              </a>
+            }
+          </div>
+        </section>
+      }
+
+      <div class="survey-controls">
+        <div class="survey-tabs">
+          <button
+            type="button"
+            [class.is-active]="activeTab() === 'active'"
+            (click)="setActiveTab('active')"
+          >
+            Active survey
+          </button>
+
+          <button
+            type="button"
+            [class.is-active]="activeTab() === 'past'"
+            (click)="setActiveTab('past')"
+          >
+            Past survey
+          </button>
+        </div>
+
+        <div class="category-filter">
+          <button
+            type="button"
+            class="category-filter__trigger"
+            [class.is-open]="isCategoryMenuOpen()"
+            [attr.aria-expanded]="isCategoryMenuOpen()"
+            aria-haspopup="listbox"
+            (click)="toggleCategoryMenu()"
+          >
+            <span>Sort by categories</span>
+            <img src="/assets/arrow_drop_down_orange.svg" alt="" />
+          </button>
+
+          @if (isCategoryMenuOpen()) {
+            <ul class="category-filter__menu" role="listbox">
+              @for (category of categories; track category) {
+                <li>
+                  <button
+                    type="button"
+                    [class.is-selected]="selectedCategory() === category"
+                    (click)="selectCategory(category)"
+                  >
+                    {{ category }}
+                  </button>
+                </li>
+              }
+            </ul>
+          }
+
+          @if (selectedCategory() !== 'All Surveys') {
+            <p class="category-filter__selected">
+              {{ selectedCategory() }}
+            </p>
+          }
+        </div>
+      </div>
+
+      @if (visibleSurveys().length > 0) {
+        <div class="survey-list">
+          @for (survey of visibleSurveys(); track survey.id) {
+            <a class="survey-row" [routerLink]="['/surveys', survey.id]">
+              <span>{{ survey.category }}</span>
+              <strong>{{ survey.title }}</strong>
+              <small>{{ getDeadlineBadge(survey) }}</small>
+            </a>
+          }
+        </div>
+      } @else {
+        <p class="state-message">No surveys found for this selection.</p>
+      }
+    }
+  </section>
+  @if (isCreateSurveyModalOpen()) {
+    <app-create-survey-modal
+      (closeModal)="closeCreateSurveyModal()"
+      (surveyCreated)="handleSurveyCreated($event)"
+    />
+  }
+</main>
