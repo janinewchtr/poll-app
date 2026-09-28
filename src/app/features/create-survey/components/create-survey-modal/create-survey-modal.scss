@@ -483,7 +483,7 @@ button:focus-visible {
   outline-offset: 3px;
 }
 
-@media (min-width: 1440px) {
+@media (min-width: 1401px) {
   .create-survey-modal {
     width: min(100% - 72px, 1400px);
     padding: 48px 64px 44px;
@@ -503,9 +503,9 @@ button:focus-visible {
   }
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1400px) {
   .create-survey-modal {
-    width: min(100% - 40px, 1080px);
+    width: min(100% - 40px, 1180px);
     padding: 38px 42px 36px;
   }
 
