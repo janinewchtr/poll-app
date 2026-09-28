@@ -731,12 +731,13 @@ button:focus-visible {
 }
 
 @media (max-width: 560px) {
-  :host {
-    display: grid;
-    place-items: center;
-    overflow-y: auto;
-    background: var(--color-bg-app);
-  }
+    :host {
+      display: grid;
+      place-items: start center;
+      align-items: start;
+      overflow-y: auto;
+      background: var(--color-bg-app);
+      }
 
   .modal-backdrop {
     display: none;
