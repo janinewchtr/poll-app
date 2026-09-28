@@ -505,17 +505,18 @@ button:focus-visible {
 
 @media (max-width: 1400px) {
   .create-survey-modal {
-    width: min(100% - 40px, 1180px);
+    width: min(100% - 40px, 920px);
     padding: 38px 42px 36px;
   }
 
   .form-panel {
-    padding-inline: 28px;
+    padding: 34px 28px 40px;
   }
 
   .survey-basics {
     grid-template-columns: 1fr;
     gap: 34px;
+    margin-bottom: 52px;
   }
 
   .survey-basics__row {
@@ -528,7 +529,16 @@ button:focus-visible {
   }
 
   .questions-editor {
-    column-gap: 48px;
+    grid-template-columns: 1fr;
+    row-gap: 40px;
+  }
+
+  .question-editor {
+    max-width: 640px;
+  }
+
+  .add-question-button {
+    margin-top: 4px;
   }
 }
 
@@ -731,13 +741,13 @@ button:focus-visible {
 }
 
 @media (max-width: 560px) {
-    :host {
-      display: grid;
-      place-items: start center;
-      align-items: start;
-      overflow-y: auto;
-      background: var(--color-bg-app);
-      }
+  :host {
+    display: grid;
+    place-items: start center;
+    align-items: start;
+    overflow-y: auto;
+    background: var(--color-bg-app);
+  }
 
   .modal-backdrop {
     display: none;
