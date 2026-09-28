@@ -509,14 +509,22 @@ button:focus-visible {
     padding: 38px 42px 36px;
   }
 
+  .form-panel {
+    padding-inline: 28px;
+  }
+
   .survey-basics {
-    grid-template-columns: minmax(0, 1fr) minmax(360px, 440px);
-    gap: 46px;
+    grid-template-columns: 1fr;
+    gap: 34px;
   }
 
   .survey-basics__row {
-    grid-template-columns: minmax(220px, 280px) minmax(220px, 280px);
+    grid-template-columns: minmax(220px, 280px) minmax(260px, 320px);
     gap: 28px;
+  }
+
+  .form-field--description {
+    max-width: 640px;
   }
 
   .questions-editor {
