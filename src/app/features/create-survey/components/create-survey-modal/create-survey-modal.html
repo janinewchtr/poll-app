@@ -40,7 +40,7 @@
                   aria-label="Clear survey name"
                   (click)="form.controls.title.setValue('')"
                 >
-                  <img src="/assets/delete-white.svg" alt="" />
+                  <img src="assets/delete-white.svg" alt="" />
                 </button>
               </div>
 
@@ -62,7 +62,7 @@
                     aria-label="Clear deadline"
                     (click)="form.controls.deadline.setValue('')"
                   >
-                    <img src="/assets/delete-white.svg" alt="" />
+                    <img src="assets/delete-white.svg" alt="" />
                   </button>
                 </div>
               </label>
@@ -81,7 +81,7 @@
                     (click)="toggleCategoryMenu($event)"
                   >
                     <span>{{ selectedCategoryLabel() }}</span>
-                    <img src="/assets/arrow_drop_down_orange.svg" alt="" />
+                    <img src="assets/arrow_drop_down_orange.svg" alt="" />
                   </button>
 
                   @if (isCategoryMenuOpen()) {
@@ -120,7 +120,7 @@
                 aria-label="Clear description"
                 (click)="form.controls.description.setValue('')"
               >
-                <img src="/assets/delete-white.svg" alt="" />
+                <img src="assets/delete-white.svg" alt="" />
               </button>
             </div>
           </label>
@@ -139,7 +139,7 @@
                   [disabled]="questions().length === 1"
                   (click)="removeQuestion(questionIndex)"
                 >
-                  <img src="/assets/delete-white.svg" alt="" />
+                  <img src="assets/delete-white.svg" alt="" />
                 </button>
               </div>
 
@@ -178,7 +178,7 @@
                       [disabled]="getOptions(questionIndex).length <= 2"
                       (click)="removeOption(questionIndex, optionIndex)"
                     >
-                      <img src="/assets/delete-white.svg" alt="" />
+                      <img src="assets/delete-white.svg" alt="" />
                     </button>
                   </div>
 
@@ -190,7 +190,7 @@
                 @if (canAddOption(questionIndex)) {
                   <button type="button" class="tertiary-button" (click)="addOption(questionIndex)">
                     Add answer
-                    <img src="/assets/add_circle_white.svg" alt="" />
+                    <img src="assets/add_circle_white.svg" alt="" />
                   </button>
                 }
               </div>
@@ -199,7 +199,7 @@
 
           <button type="button" class="add-question-button" (click)="addQuestion()">
             Add next question
-            <img src="/assets/add_circle_white.svg" alt="" />
+            <img src="assets/add_circle_white.svg" alt="" />
           </button>
         </section>
       </div>
