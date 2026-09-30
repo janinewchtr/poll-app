@@ -58,13 +58,13 @@
   justify-content: space-between;
   gap: 24px;
   margin-bottom: 12px;
-  font-size: 12px;
+  font-size: 16px;
 }
 
 .survey-card__meta p {
   margin: 6px 0 0;
   color: var(--color-text-dark);
-  font-size: 11px;
+  font-size: 14px;
   line-height: 1.2;
 }
 
@@ -75,7 +75,7 @@
   border-radius: 0 12px 0 0;
   padding: 4px 10px;
   color: var(--color-text-dark);
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 800;
   line-height: 1;
   background: var(--color-primary-orange);
@@ -133,7 +133,7 @@ h3 {
 .question-card p {
   margin: 4px 0 18px;
   color: var(--color-text-dark);
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 500;
   line-height: 1.2;
 }
@@ -150,7 +150,7 @@ h3 {
   align-items: center;
   gap: 12px;
   color: var(--color-text-dark);
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 500;
   line-height: 1.25;
   cursor: pointer;
@@ -207,7 +207,7 @@ h3 {
   border-radius: 0 12px 0 0;
   padding: 0 16px;
   color: var(--color-text-dark);
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 800;
   background: var(--color-secondary-orange-hover);
 }
@@ -224,7 +224,7 @@ h3 {
   max-width: 260px;
   margin: 0;
   color: var(--color-text-dark);
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 800;
   text-align: right;
 }
@@ -303,7 +303,7 @@ h3 {
 
 .result-row__label {
   color: var(--color-text-dark);
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 800;
 }
 
@@ -323,7 +323,7 @@ h3 {
 
 .result-row__percent {
   color: var(--color-primary-orange);
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 900;
   text-align: right;
 }
@@ -445,7 +445,7 @@ h3 {
   .primary-button {
     min-height: 38px;
     padding-inline: 16px;
-    font-size: 13px;
+    font-size: 16px;
   }
 
   .survey-card {
@@ -517,7 +517,7 @@ h3 {
   .primary-button {
     min-height: 34px;
     padding-inline: 12px;
-    font-size: 12px;
+    font-size: 16px;
   }
 
   .survey-card {
@@ -527,13 +527,13 @@ h3 {
 
   .survey-card__meta {
     margin-bottom: 10px;
-    font-size: 11px;
+    font-size: 14px;
   }
 
   .status-badge {
     min-height: 22px;
     padding-inline: 8px;
-    font-size: 11px;
+    font-size: 14px;
   }
 
   .survey-card h1 {
@@ -542,7 +542,7 @@ h3 {
 
   .survey-card__description {
     margin: 14px 0 28px;
-    font-size: 13px;
+    font-size: 16px;
   }
 
   .question-card legend {
@@ -552,7 +552,7 @@ h3 {
   .answer-option {
     grid-template-columns: 16px minmax(0, 1fr);
     gap: 10px;
-    font-size: 12px;
+    font-size: 16px;
   }
 
   .answer-option input {
@@ -564,14 +564,14 @@ h3 {
     right: 16px;
     min-height: 32px;
     padding-inline: 14px;
-    font-size: 11px;
+    font-size: 14px;
   }
 
   .submit-message {
     right: 16px;
     left: 16px;
     max-width: none;
-    font-size: 11px;
+    font-size: 14px;
   }
 
   .results-panel h2 {
@@ -590,7 +590,7 @@ h3 {
 
   .result-row__label,
   .result-row__percent {
-    font-size: 12px;
+    font-size: 16px;
   }
 
   .result-row__track {
@@ -598,7 +598,7 @@ h3 {
   }
 
   .results-panel > p {
-    font-size: 13px;
+    font-size: 16px;
   }
 }
 
