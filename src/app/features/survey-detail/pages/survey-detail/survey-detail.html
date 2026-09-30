@@ -57,7 +57,7 @@
                         [type]="question.allowMultiple ? 'checkbox' : 'radio'"
                         [name]="question.id"
                         [checked]="isOptionSelected(question.id, option.id)"
-                        [disabled]="isPastSurvey() || isSubmitting()"
+                        [disabled]="isPastSurvey() || isSubmitting() || hasCompletedSurvey()"
                         (change)="handleAnswerChange(question, option.id, $event)"
                       />
 
@@ -80,7 +80,7 @@
 
         @if (successMessage()) {
           <p class="submit-message">
-            {{ successMessage() }}
+            You have already completed this survey.
           </p>
         }
 

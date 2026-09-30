@@ -17,6 +17,8 @@ type SurveyWithRawQuestions = Omit<Survey, 'questions'> & {
 
 type VotesSubscription = ReturnType<SupabaseService['subscribeToSurveyVotes']>;
 
+const VOTED_SURVEY_STORAGE_PREFIX = 'poll-app-voted-survey-';
+
 /**
  * Shows one survey, handles vote submission and displays realtime result updates.
  */
@@ -44,6 +46,7 @@ export class SurveyDetail implements OnDestroy {
   readonly successMessage = signal<string | null>(null);
   readonly selectedAnswers = signal<Record<string, string[]>>({});
   readonly isCreateSurveyModalOpen = signal<boolean>(false);
+  readonly hasCompletedSurvey = signal<boolean>(false);
 
   readonly questions = computed<SurveyQuestion[]>(() => {
     return this.survey()?.questions ?? [];
@@ -68,7 +71,7 @@ export class SurveyDetail implements OnDestroy {
   });
 
   readonly canSubmitSurvey = computed<boolean>(() => {
-    if (this.isPastSurvey() || this.isSubmitting()) {
+    if (this.isPastSurvey() || this.isSubmitting() || this.hasCompletedSurvey()) {
       return false;
     }
 
@@ -144,6 +147,9 @@ export class SurveyDetail implements OnDestroy {
    * Updates the selected answers when a radio button or checkbox changes.
    */
   handleAnswerChange(question: SurveyQuestion, optionId: string, event: Event): void {
+    if (this.hasCompletedSurvey()) {
+      return;
+    }
     const inputElement = event.target as HTMLInputElement;
 
     if (question.allowMultiple) {
@@ -231,6 +237,8 @@ export class SurveyDetail implements OnDestroy {
    * Shows success feedback, clears answers and refreshes the vote results.
    */
   private async handleVoteSubmitSuccess(surveyId: string): Promise<void> {
+    this.storeCompletedSurvey(surveyId);
+this.hasCompletedSurvey.set(true);
     this.successMessage.set('Your vote has been submitted.');
     this.selectedAnswers.set({});
 
@@ -297,6 +305,7 @@ export class SurveyDetail implements OnDestroy {
     const normalizedSurvey = this.normalizeSurveyQuestions(survey as SurveyWithRawQuestions);
 
     this.survey.set(normalizedSurvey);
+    this.hasCompletedSurvey.set(this.hasStoredVote(normalizedSurvey.id));
     this.selectedAnswers.set({});
     this.successMessage.set(null);
 
@@ -453,5 +462,16 @@ export class SurveyDetail implements OnDestroy {
         [questionId]: nextQuestionAnswers,
       };
     });
+  }
+  private hasStoredVote(surveyId: string): boolean {
+    return localStorage.getItem(this.getCompletedSurveyStorageKey(surveyId)) === 'true';
+  }
+
+  private storeCompletedSurvey(surveyId: string): void {
+    localStorage.setItem(this.getCompletedSurveyStorageKey(surveyId), 'true');
+  }
+
+  private getCompletedSurveyStorageKey(surveyId: string): string {
+    return `${VOTED_SURVEY_STORAGE_PREFIX}${surveyId}`;
   }
 }
