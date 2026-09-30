@@ -41,6 +41,7 @@ type SurveyQuestionPayload = CreateSurveyPayload['questions'][number];
 type SurveyOptionPayload = SurveyQuestionPayload['options'][number];
 
 const MAX_OPTIONS_PER_QUESTION = 6;
+const PUBLISHED_OVERLAY_VISIBLE_MS = 3000;
 
 /**
  * Displays the survey creation overlay and manages its reactive form state.
@@ -61,6 +62,7 @@ export class CreateSurveyModal implements OnInit, OnDestroy {
   private readonly supabaseService = inject(SupabaseService);
 
   private previousBodyOverflow = '';
+  private publishedOverlayTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   readonly categories = SURVEY_CATEGORIES;
   readonly isSubmitting = signal<boolean>(false);
@@ -119,6 +121,7 @@ export class CreateSurveyModal implements OnInit, OnDestroy {
    * Restores the previous body scroll behavior when the modal is destroyed.
    */
   ngOnDestroy(): void {
+    this.clearPublishedOverlayTimeout();
     this.document.body.style.overflow = this.previousBodyOverflow;
   }
 
@@ -138,11 +141,12 @@ export class CreateSurveyModal implements OnInit, OnDestroy {
    */
   closePublishedOverlay(): void {
     const surveyId = this.createdSurveyId();
-
+  
     if (!surveyId) {
       return;
     }
-
+  
+    this.clearPublishedOverlayTimeout();
     this.surveyCreated.emit(surveyId);
     this.closeModal.emit();
   }
@@ -249,13 +253,48 @@ export class CreateSurveyModal implements OnInit, OnDestroy {
       this.submitError.set(null);
 
       const createdSurvey = await this.supabaseService.createSurvey(this.createSurveyPayload());
-      this.createdSurveyId.set(createdSurvey.id);
+      this.showPublishedOverlayFor(createdSurvey.id);
     } catch {
       this.submitError.set('Survey could not be created.');
     } finally {
       this.isSubmitting.set(false);
     }
   }
+
+  /**
+ * Shows the published message and closes it automatically after a short delay.
+ */
+private showPublishedOverlayFor(surveyId: string): void {
+    this.createdSurveyId.set(surveyId);
+    this.startPublishedOverlayTimeout();
+  }
+  
+  /**
+   * Starts the timer for the published confirmation overlay.
+   */
+  private startPublishedOverlayTimeout(): void {
+    this.clearPublishedOverlayTimeout();
+  
+    this.publishedOverlayTimeoutId = setTimeout(() => {
+      this.closePublishedOverlay();
+    }, PUBLISHED_OVERLAY_VISIBLE_MS);
+  }
+  
+  /**
+   * Clears the published overlay timer when it is no longer needed.
+   */
+  private clearPublishedOverlayTimeout(): void {
+    if (!this.publishedOverlayTimeoutId) {
+      return;
+    }
+  
+    clearTimeout(this.publishedOverlayTimeoutId);
+    this.publishedOverlayTimeoutId = null;
+  }
+  
+  /**
+   * Creates the default reactive form group for a new question.
+   */
 
   /**
    * Creates the default reactive form group for a new question.
