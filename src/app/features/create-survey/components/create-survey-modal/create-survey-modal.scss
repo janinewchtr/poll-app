@@ -743,8 +743,10 @@ button:focus-visible {
 @media (max-width: 560px) {
   :host {
     display: grid;
+    width: 100vw;
     place-items: start center;
     align-items: start;
+    overflow-x: hidden;
     overflow-y: auto;
     background: var(--color-bg-app);
   }
@@ -755,9 +757,11 @@ button:focus-visible {
 
   .create-survey-modal {
     width: 100%;
+    max-width: 100vw;
     min-height: 100vh;
     max-height: none;
     margin: 0;
+    overflow-x: hidden;
     overflow-y: visible;
     padding: 24px 16px 28px;
     border-radius: 0;
@@ -765,8 +769,15 @@ button:focus-visible {
   }
 
   .modal-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: flex-start;
+    gap: 12px;
     margin-bottom: 24px;
+  }
+  
+  .modal-header > div {
+    min-width: 0;
   }
 
   h2 {
@@ -776,9 +787,13 @@ button:focus-visible {
   }
 
   .close-button {
+    min-width: 34px;
     min-height: 30px;
-    padding: 0 10px;
-    font-size: 16px;
+    justify-content: center;
+    justify-self: end;
+    padding: 0 8px;
+    font-size: 0;
+    flex-shrink: 0;
   }
 
   .close-button span {
@@ -842,15 +857,15 @@ button:focus-visible {
   }
 
   .checkbox-field {
-    grid-template-columns: 14px minmax(0, max-content);
-    gap: 10px;
+    grid-template-columns: 16px max-content;
+    gap: 12px;
     font-size: 14px;
   }
 
   .checkbox-field input {
-    width: 14px;
-    height: 14px;
-    min-width: 14px;
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
   }
 
   .answer-row {
@@ -920,18 +935,9 @@ button:focus-visible {
   }
 
   .checkbox-field {
-    grid-template-columns: 13px minmax(0, 1fr);
-    gap: 8px;
     font-size: 14px;
-    white-space: normal;
   }
-  
-  .checkbox-field input {
-    width: 13px;
-    height: 13px;
-    min-width: 13px;
-  }
-  
+
   .add-question-button {
     font-size: 16px;
   }
