@@ -43,10 +43,11 @@
                   <img src="assets/delete-white.svg" alt="" />
                 </button>
               </div>
-
+              <div class="field-error">
               @if (form.controls.title.touched && form.controls.title.invalid) {
-                <small>Survey name is required.</small>
+                Survey name is required.
               }
+              </div>
             </label>
 
             <div class="survey-basics__row">
@@ -100,10 +101,11 @@
                     </ul>
                   }
                 </div>
-
+                <div class="field-error">
                 @if (form.controls.category.touched && form.controls.category.invalid) {
-                  <small>Category is required.</small>
+                  Category is required.
                 }
+                </div>
               </div>
             </div>
           </div>
@@ -146,9 +148,11 @@
               <label class="form-field">
                 <input type="text" formControlName="text" />
 
+                <div class="field-error">
                 @if (question.controls.text.touched && question.controls.text.invalid) {
-                  <small>Question is required.</small>
+                  Question is required.
                 }
+                </div>
               </label>
 
               <div class="answers-heading">
@@ -182,9 +186,11 @@
                     </button>
                   </div>
 
-                  @if (option.touched && option.invalid) {
-                    <small class="answer-error">Answer is required.</small>
-                  }
+                  <div class="field-error field-error--answer">
+                    @if (option.touched && option.invalid) {
+                      Answer is required.
+                    }
+                  </div>
                 }
 
                 @if (canAddOption(questionIndex)) {
@@ -205,9 +211,11 @@
       </div>
 
       <div class="modal-actions">
-        @if (submitError()) {
-          <p>{{ submitError() }}</p>
-        }
+        <p class="submit-error">
+            @if (submitError()) {
+              {{ submitError() }}
+            }
+          </p>
 
         <button type="submit" class="publish-button" [disabled]="isSubmitting()">
           @if (isSubmitting()) {

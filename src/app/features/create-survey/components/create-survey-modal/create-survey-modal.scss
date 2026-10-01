@@ -243,12 +243,17 @@ input {
   background: var(--color-bg-survey);
 }
 
-small,
-.answer-error {
-  color: var(--color-primary-orange);
-  font-size: 15px;
-  font-weight: 800;
-}
+.field-error {
+    min-height: 18px;
+    color: var(--color-primary-orange);
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.2;
+  }
+  
+  .field-error--answer {
+    margin-left: 40px;
+  }
 
 .icon-button {
   width: 28px;
@@ -410,12 +415,14 @@ small,
   min-height: 72px;
 }
 
-.modal-actions p {
-  margin: 0 auto 0 0;
-  color: var(--color-primary-orange);
-  font-size: 16px;
-  font-weight: 800;
-}
+.submit-error {
+    min-height: 20px;
+    margin: 0 auto 0 0;
+    color: var(--color-primary-orange);
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.2;
+  }
 
 .publish-button {
   min-height: 50px;
@@ -885,7 +892,7 @@ button:focus-visible {
     min-height: 72px;
   }
 
-  .modal-actions p {
+  .submit-error {
     margin-right: 16px;
     font-size: 16px;
   }
