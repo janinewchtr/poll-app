@@ -64,9 +64,42 @@ h1 {
   border-radius: 8px;
   padding: 0 18px;
   color: var(--color-text-dark);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 800;
+  background: var(--color-secondary-orange);
+  cursor: pointer;
+}
+
+.hero__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition:
+    background-color 160ms ease,
+    transform 160ms ease;
+}
+
+.hero__button-icon {
+  width: 0;
+  height: 22px;
+  opacity: 0;
+  transform: scale(0.75);
+  transition:
+    width 160ms ease,
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.hero__button:hover,
+.hero__button:focus-visible {
   background: var(--color-primary-orange);
+}
+
+.hero__button:hover .hero__button-icon,
+.hero__button:focus-visible .hero__button-icon {
+  width: 22px;
+  opacity: 1;
+  transform: scale(1);
 }
 
 .hero-visual {
@@ -190,11 +223,19 @@ h1 {
   text-decoration: none;
   background: var(--color-bg-card);
   border-radius: 0 64px 0 0;
+  transition:
+  background-color 160ms ease,
+  transform 160ms ease;
+}
+
+.highlight-card:hover,
+.highlight-card:focus-visible {
+  background: var(--color-bg-card-hover);
 }
 
 .highlight-card span {
   color: var(--color-text-dark);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
 }
 
@@ -236,10 +277,21 @@ h1 {
   font-size: 16px;
   font-weight: 500;
   background: var(--color-bg-card);
+  transition: background-color 160ms ease;
+}
+
+.survey-tabs button:hover,
+.survey-tabs button:focus-visible {
+  background: var(--color-secondary-orange);
 }
 
 .survey-tabs button.is-active {
   background: var(--color-primary-orange);
+}
+
+.survey-tabs button.is-active:hover,
+.survey-tabs button.is-active:focus-visible {
+  background: var(--color-secondary-orange);
 }
 
 .category-filter {
@@ -331,11 +383,17 @@ h1 {
   text-decoration: none;
   background: var(--color-bg-panel-dark);
   border-radius: 0 42px 0 0;
+  transition: background-color 160ms ease;
+}
+
+.survey-row:hover,
+.survey-row:focus-visible {
+  background: var(--color-bg-panel-dark-hover);
 }
 
 .survey-row span {
   color: var(--color-primary-orange);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
 }
 
@@ -356,9 +414,15 @@ h1 {
   border-radius: 0 12px 0 0;
   padding: 3px 10px;
   color: var(--color-text-dark);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   line-height: 1;
+  background: var(--color-secondary-orange);
+  transition: background-color 160ms ease;
+}
+
+.highlight-card:hover small,
+.highlight-card:focus-visible small {
   background: var(--color-primary-orange);
 }
 
@@ -749,7 +813,7 @@ h1 {
 
   .hero__text p {
     max-width: 330px;
-    font-size: 14px;
+    font-size: 16px;
   }
 
   .primary-button {
@@ -770,7 +834,7 @@ h1 {
   .survey-tabs button {
     min-height: 22px;
     padding-inline: 10px;
-    font-size: 14px;
+    font-size: 16px;
   }
 
   .category-filter {
