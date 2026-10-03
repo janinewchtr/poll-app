@@ -81,6 +81,12 @@ h2 {
   font-size: 18px;
   font-weight: 900;
   background: var(--color-secondary-orange-hover);
+  transition: background-color 160ms ease;
+}
+
+.close-button:hover,
+.close-button:focus-visible {
+  background: var(--color-secondary-orange);
 }
 
 .close-button span {
@@ -401,6 +407,13 @@ input {
   font-size: 18px;
   font-weight: 900;
   background: var(--color-secondary-orange-hover);
+  cursor: pointer;
+  transition: background-color 160ms ease;
+}
+
+.add-question-button:hover,
+.add-question-button:focus-visible {
+  background: var(--color-secondary-orange);
 }
 
 .add-question-button img {
@@ -424,15 +437,47 @@ input {
     line-height: 1.2;
   }
 
-.publish-button {
-  min-height: 50px;
-  border: 0;
-  border-radius: 0 16px 0 0;
-  padding: 0 24px;
-  color: var(--color-text-dark);
-  font-size: 22px;
-  font-weight: 900;
-  background: var(--color-secondary-orange);
+  .publish-button {
+    min-height: 50px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: 0;
+    border-radius: 0 16px 0 0;
+    padding: 0 24px;
+    color: var(--color-text-dark);
+    font-size: 22px;
+    font-weight: 900;
+    white-space: nowrap;
+    background: var(--color-secondary-orange);
+    cursor: pointer;
+    transition: background-color 160ms ease;
+  }
+
+.publish-button:hover,
+.publish-button:focus-visible {
+  background: var(--color-primary-orange);
+}
+
+.publish-button__icon {
+    width: 0;
+    height: 22px;
+    display: block;
+    flex-shrink: 0;
+    opacity: 0;
+    transform: scale(0.75);
+    transition:
+      width 160ms ease,
+      opacity 160ms ease,
+      transform 160ms ease;
+  }
+
+.publish-button:hover .publish-button__icon,
+.publish-button:focus-visible .publish-button__icon {
+  width: 22px;
+  opacity: 1;
+  transform: scale(1);
 }
 
 .publish-button:disabled {

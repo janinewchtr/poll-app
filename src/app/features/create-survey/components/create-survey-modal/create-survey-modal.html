@@ -218,11 +218,12 @@
           </p>
 
         <button type="submit" class="publish-button" [disabled]="isSubmitting()">
-          @if (isSubmitting()) {
-            Publishing...
-          } @else {
-            Publish
-          }
+            @if (isSubmitting()) {
+              <span>Publishing...</span>
+            } @else {
+              <span>Publish</span>
+              <img class="publish-button__icon" src="assets/check.svg" alt="" aria-hidden="true" />
+            }
         </button>
       </div>
     </form>
