@@ -179,7 +179,6 @@
                       type="button"
                       class="icon-button"
                       aria-label="Delete answer"
-                      [disabled]="getOptions(questionIndex).length <= 2"
                       (click)="removeOption(questionIndex, optionIndex)"
                     >
                       <img src="assets/delete-white.svg" alt="" />

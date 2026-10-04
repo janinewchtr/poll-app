@@ -11,6 +11,9 @@ import {
   SurveyVote,
 } from '../models/survey.model';
 
+const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
+const SURVEY_VISIBLE_AFTER_END_MS = MILLISECONDS_PER_DAY;
+
 /**
  * Handles all Supabase reads, writes and realtime subscriptions for surveys and votes.
  */
@@ -32,13 +35,29 @@ export class SupabaseService {
       .select('*')
       .eq('status', 'published')
       .order('deadline', { ascending: true, nullsFirst: false });
-
+  
     if (error) {
       throw error;
     }
-
-    return (data ?? []).map((survey: SurveyRow) => this.normalizeSurvey(survey));
+  
+    return (data ?? [])
+      .map((survey: SurveyRow) => this.normalizeSurvey(survey))
+      .filter((survey: Survey) => this.isSurveyStillVisible(survey));
   }
+
+
+/**
+ * Checks whether a survey is still inside its 24-hour visibility window.
+ */
+private isSurveyStillVisible(survey: Survey): boolean {
+  const now = Date.now();
+
+  if (!survey.deadline) {
+    return new Date(survey.created_at).getTime() + SURVEY_VISIBLE_AFTER_END_MS >= now;
+  }
+
+  return new Date(survey.deadline).getTime() + SURVEY_VISIBLE_AFTER_END_MS >= now;
+}
 
   /**
    * Loads a single survey by id and returns null when no matching survey exists.

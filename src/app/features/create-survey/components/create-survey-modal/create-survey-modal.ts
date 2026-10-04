@@ -10,11 +10,14 @@ import {
   signal,
 } from '@angular/core';
 import {
+  AbstractControl,
   FormArray,
   FormBuilder,
   FormControl,
   FormGroup,
   ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
   Validators,
 } from '@angular/forms';
 
@@ -42,6 +45,23 @@ type SurveyOptionPayload = SurveyQuestionPayload['options'][number];
 
 const MAX_OPTIONS_PER_QUESTION = 6;
 const PUBLISHED_OVERLAY_VISIBLE_MS = 3000;
+
+const HAS_LETTER_PATTERN = /\p{L}/u;
+
+/**
+ * Checks whether a text field contains at least one letter.
+ */
+function containsLetterValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = control.value;
+
+    if (typeof value !== 'string') {
+      return null;
+    }
+
+    return HAS_LETTER_PATTERN.test(value.trim()) ? null : { missingLetters: true };
+  };
+}
 
 /**
  * Displays the survey creation overlay and manages its reactive form state.
@@ -80,7 +100,7 @@ export class CreateSurveyModal implements OnInit, OnDestroy {
   });
 
   readonly form: CreateSurveyForm = this.formBuilder.nonNullable.group({
-    title: ['', [Validators.required, Validators.minLength(3)]],
+    title: ['', [Validators.required, Validators.minLength(3), containsLetterValidator()]],
     description: [''],
     category: ['', Validators.required],
     deadline: [''],
@@ -202,7 +222,9 @@ export class CreateSurveyModal implements OnInit, OnDestroy {
       return;
     }
 
-    options.push(this.formBuilder.nonNullable.control('', Validators.required));
+    options.push(
+        this.formBuilder.nonNullable.control('', [Validators.required, containsLetterValidator()]),
+      );
   }
 
   /**
@@ -212,16 +234,21 @@ export class CreateSurveyModal implements OnInit, OnDestroy {
     return this.getOptions(questionIndex).length < MAX_OPTIONS_PER_QUESTION;
   }
 
-  /**
-   * Removes an answer option while keeping the minimum of two options.
-   */
-  removeOption(questionIndex: number, optionIndex: number): void {
+/**
+ * Removes an answer option or clears it when the minimum option count is reached.
+ */
+removeOption(questionIndex: number, optionIndex: number): void {
     const options = this.getOptions(questionIndex);
-
+  
     if (options.length <= 2) {
+      const option = options.at(optionIndex);
+  
+      option.setValue('');
+      option.markAsPristine();
+      option.markAsUntouched();
       return;
     }
-
+  
     options.removeAt(optionIndex);
   }
 
@@ -301,11 +328,11 @@ private showPublishedOverlayFor(surveyId: string): void {
    */
   private createQuestion(): QuestionForm {
     return this.formBuilder.nonNullable.group({
-      text: ['', Validators.required],
+      text: ['', [Validators.required, containsLetterValidator()]],
       allowMultiple: [false],
       options: this.formBuilder.array<FormControl<string>>([
-        this.formBuilder.nonNullable.control('', Validators.required),
-        this.formBuilder.nonNullable.control('', Validators.required),
+        this.formBuilder.nonNullable.control('', [Validators.required, containsLetterValidator()]),
+        this.formBuilder.nonNullable.control('', [Validators.required, containsLetterValidator()]),
       ]),
     });
   }
