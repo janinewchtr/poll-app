@@ -52,7 +52,10 @@
 
                 <div class="answer-list">
                   @for (option of question.options; track option.id) {
-                    <label class="answer-option">
+                    <label
+                    class="answer-option"
+                    [class.answer-option--locked]="hasCompletedSurvey()"
+                  >
                       <input
                         [type]="question.allowMultiple ? 'checkbox' : 'radio'"
                         [name]="question.id"
@@ -71,37 +74,35 @@
         } @else {
           <p class="state-message">No questions found for this survey.</p>
         }
-
-        @if (errorMessage()) {
-          <p class="submit-message submit-message--error">
-            {{ errorMessage() }}
-          </p>
-        }
-
-        @if (successMessage()) {
-          <p class="submit-message">
-            {{ successMessage() }}
-          </p>
-        }
+        <div class="submit-area">
+          <button
+            type="button"
+            class="complete-button"
+            [class.complete-button--published]="hasCompletedSurvey()"
+            [disabled]="!canSubmitSurvey()"
+            (click)="submitVote()"
+          >
+            @if (hasCompletedSurvey()) {
+              Already completed
+            } @else if (isSubmitting()) {
+              Submitting...
+            } @else {
+              Complete survey
+            }
+          </button>
         
-        @if (hasCompletedSurvey() && !successMessage()) {
-          <p class="submit-message">
-            You have already completed this survey.
-          </p>
-        }
-
-        <button
-          type="button"
-          class="complete-button"
-          [disabled]="!canSubmitSurvey()"
-          (click)="submitVote()"
-        >
-          @if (isSubmitting()) {
-            Submitting...
-          } @else {
-            Complete survey
-          }
-        </button>
+          <div class="submit-message-space" aria-live="polite">
+            @if (errorMessage()) {
+              <p class="submit-message submit-message--error">
+                {{ errorMessage() }}
+              </p>
+            } @else if (successMessage()) {
+              <p class="submit-message">
+                {{ successMessage() }}
+              </p>
+            }
+          </div>
+        </div>
       </article>
 
       <aside class="results-panel">

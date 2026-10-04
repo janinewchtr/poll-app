@@ -149,6 +149,7 @@ h3 {
   grid-template-columns: 18px minmax(0, 1fr);
   align-items: center;
   gap: 12px;
+  border-radius: 4px;
   color: var(--color-text-dark);
   font-size: 16px;
   font-weight: 500;
@@ -167,7 +168,11 @@ h3 {
   cursor: pointer;
 }
 
-.answer-option input:hover {
+.answer-option:not(:has(input:disabled)):has(input:hover) {
+  background: var(--color-secondary-orange);
+}
+
+.answer-option:not(:has(input:disabled)) input:hover {
   background: var(--color-secondary-orange);
 }
 
@@ -180,28 +185,34 @@ h3 {
   background-size: 14px 14px;
 }
 
+.answer-option:has(input:checked) {
+  background: transparent;
+}
+
+.answer-option:has(input:disabled) {
+  cursor: default;
+}
+
 .answer-option input:disabled {
   opacity: 0.45;
-  cursor: not-allowed;
+  cursor: default;
 }
 
 .answer-option input:disabled + span {
   opacity: 0.65;
 }
 
-.answer-option:has(input:hover) {
-  border-radius: 4px;
-  background: var(--color-secondary-orange);
-}
-
-.answer-option:has(input:checked) {
-  background: transparent;
+.submit-area {
+  position: absolute;
+  right: 40px;
+  bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
 }
 
 .complete-button {
-  position: absolute;
-  right: 40px;
-  bottom: 36px;
   min-height: 34px;
   border: 0;
   border-radius: 0 12px 0 0;
@@ -209,23 +220,39 @@ h3 {
   color: var(--color-text-dark);
   font-size: 16px;
   font-weight: 800;
-  background: var(--color-secondary-orange-hover);
+  background: var(--color-secondary-orange);
+  cursor: pointer;
+  transition: background-color 160ms ease;
+}
+
+.complete-button:not(:disabled):hover,
+.complete-button:not(:disabled):focus-visible {
+  background: var(--color-primary-orange);
 }
 
 .complete-button:disabled {
-  opacity: 0.55;
   cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.complete-button--published,
+.complete-button--published:disabled {
+  background: var(--color-secondary-orange);
+  cursor: default;
+  opacity: 1;
+}
+
+.submit-message-space {
+  min-height: 40px;
 }
 
 .submit-message {
-  position: absolute;
-  right: 40px;
-  bottom: 78px;
-  max-width: 260px;
+  max-width: 280px;
   margin: 0;
   color: var(--color-text-dark);
   font-size: 16px;
   font-weight: 800;
+  line-height: 1.2;
   text-align: right;
 }
 
@@ -234,10 +261,7 @@ h3 {
 }
 
 .results-panel {
-  max-height: 730px;
-  overflow-y: auto;
   padding-top: 102px;
-  padding-right: 8px;
   color: var(--color-text-dark);
 }
 
@@ -348,6 +372,24 @@ h3 {
   outline-offset: 3px;
 }
 
+@media (max-width: 900px) {
+  .survey-card {
+    position: relative;
+    padding-bottom: 96px;
+  }
+
+  .submit-area {
+    position: absolute;
+    right: 24px;
+    bottom: 28px;
+    align-items: flex-end;
+  }
+
+  .complete-button {
+    min-width: 180px;
+  }
+}
+
 @media (min-width: 1440px) {
   .survey-detail-page {
     width: min(100%, 1360px);
@@ -362,10 +404,6 @@ h3 {
   .survey-card {
     min-height: 760px;
   }
-
-  .results-panel {
-    max-height: 760px;
-  }
 }
 
 @media (max-width: 1200px) {
@@ -379,7 +417,7 @@ h3 {
   }
 
   .survey-card {
-    padding: 34px 34px 40px;
+    padding: 34px 34px 80px;
   }
 
   .question-grid {
@@ -450,7 +488,7 @@ h3 {
 
   .survey-card {
     border-radius: 0 82px 0 0;
-    padding: 28px 24px 92px;
+    padding: 28px 24px 120px;
   }
 
   .survey-card__meta {
@@ -472,14 +510,9 @@ h3 {
     row-gap: 30px;
   }
 
-  .complete-button {
+  .submit-area {
     right: 24px;
     bottom: 28px;
-  }
-
-  .submit-message {
-    right: 24px;
-    bottom: 72px;
   }
 
   .results-panel h2 {
@@ -521,7 +554,7 @@ h3 {
   }
 
   .survey-card {
-    padding: 22px 16px 84px;
+    padding: 22px 16px 140px;
     border-radius: 0 64px 0 0;
   }
 
@@ -560,17 +593,18 @@ h3 {
     height: 16px;
   }
 
-  .complete-button {
+  .submit-area {
     right: 16px;
-    min-height: 32px;
-    padding-inline: 14px;
+    bottom: 24px;
+  }
+  
+  .submit-message {
+    max-width: 220px;
     font-size: 16px;
   }
 
-  .submit-message {
-    right: 16px;
-    left: 16px;
-    max-width: none;
+  .complete-button {
+    min-width: 160px;
     font-size: 16px;
   }
 
