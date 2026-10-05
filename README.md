@@ -19,3 +19,21 @@ The app allows users to create surveys, answer existing surveys and view the res
 - Filter surveys by category
 - Realtime result updates
 - Responsive layout
+
+## Setup
+
+Clone the project and install the dependencies:
+
+```bash
+npm install
+```
+
+Create your own Supabase project and replace the Supabase URL and anon key in `src/environments/environment.ts`.
+
+If needed, update project-specific links such as `href` values in the HTML files.
+
+Start the project locally:
+
+```bash
+npm start
+```
