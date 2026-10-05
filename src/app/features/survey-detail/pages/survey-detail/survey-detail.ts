@@ -247,7 +247,7 @@ export class SurveyDetail implements OnDestroy {
    */
   private async handleVoteSubmitSuccess(surveyId: string): Promise<void> {
     this.storeCompletedSurvey(surveyId);
-this.hasCompletedSurvey.set(true);
+    this.hasCompletedSurvey.set(true);
     this.successMessage.set('Your vote has been submitted.');
     this.selectedAnswers.set({});
 
@@ -341,33 +341,33 @@ this.hasCompletedSurvey.set(true);
     });
   }
 
-    /**
+  /**
    * Checks whether the participant has selected at least one answer.
    */
-    private hasSelectedAnswers(): boolean {
-      return Object.values(this.selectedAnswers()).some(
-        (selectedOptionIds: string[]) => selectedOptionIds.length > 0,
-      );
-    }
-  
-    /**
-     * Counts saved votes plus the participant's current selection for one question.
-     */
-    private getVisibleTotalAnswersForQuestion(questionId: string): number {
-      const selectedOptionIds = this.selectedAnswers()[questionId] ?? [];
-  
-      return this.getTotalAnswersForQuestion(questionId) + selectedOptionIds.length;
-    }
-  
-    /**
-     * Counts saved votes plus the participant's current selection for one option.
-     */
-    private getVisibleOptionVoteCount(questionId: string, optionId: string): number {
-      const selectedOptionIds = this.selectedAnswers()[questionId] ?? [];
-      const selectedOptionCount = selectedOptionIds.includes(optionId) ? 1 : 0;
-  
-      return this.getOptionVoteCount(questionId, optionId) + selectedOptionCount;
-    }
+  private hasSelectedAnswers(): boolean {
+    return Object.values(this.selectedAnswers()).some(
+      (selectedOptionIds: string[]) => selectedOptionIds.length > 0,
+    );
+  }
+
+  /**
+   * Counts saved votes plus the participant's current selection for one question.
+   */
+  private getVisibleTotalAnswersForQuestion(questionId: string): number {
+    const selectedOptionIds = this.selectedAnswers()[questionId] ?? [];
+
+    return this.getTotalAnswersForQuestion(questionId) + selectedOptionIds.length;
+  }
+
+  /**
+   * Counts saved votes plus the participant's current selection for one option.
+   */
+  private getVisibleOptionVoteCount(questionId: string, optionId: string): number {
+    const selectedOptionIds = this.selectedAnswers()[questionId] ?? [];
+    const selectedOptionCount = selectedOptionIds.includes(optionId) ? 1 : 0;
+
+    return this.getOptionVoteCount(questionId, optionId) + selectedOptionCount;
+  }
 
   /**
    * Creates the vote answer payload from the currently selected options.

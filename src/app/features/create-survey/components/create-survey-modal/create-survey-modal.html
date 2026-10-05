@@ -44,9 +44,9 @@
                 </button>
               </div>
               <div class="field-error">
-              @if (form.controls.title.touched && form.controls.title.invalid) {
-                Survey name is required.
-              }
+                @if (form.controls.title.touched && form.controls.title.invalid) {
+                  Survey name is required.
+                }
               </div>
             </label>
 
@@ -102,9 +102,9 @@
                   }
                 </div>
                 <div class="field-error">
-                @if (form.controls.category.touched && form.controls.category.invalid) {
-                  Category is required.
-                }
+                  @if (form.controls.category.touched && form.controls.category.invalid) {
+                    Category is required.
+                  }
                 </div>
               </div>
             </div>
@@ -149,9 +149,9 @@
                 <input type="text" formControlName="text" />
 
                 <div class="field-error">
-                @if (question.controls.text.touched && question.controls.text.invalid) {
-                  Question is required.
-                }
+                  @if (question.controls.text.touched && question.controls.text.invalid) {
+                    Question is required.
+                  }
                 </div>
               </label>
 
@@ -211,18 +211,18 @@
 
       <div class="modal-actions">
         <p class="submit-error">
-            @if (submitError()) {
-              {{ submitError() }}
-            }
-          </p>
+          @if (submitError()) {
+            {{ submitError() }}
+          }
+        </p>
 
         <button type="submit" class="publish-button" [disabled]="isSubmitting()">
-            @if (isSubmitting()) {
-              <span>Publishing...</span>
-            } @else {
-              <span>Publish</span>
-              <img class="publish-button__icon" src="assets/check.svg" alt="" aria-hidden="true" />
-            }
+          @if (isSubmitting()) {
+            <span>Publishing...</span>
+          } @else {
+            <span>Publish</span>
+            <img class="publish-button__icon" src="assets/check.svg" alt="" aria-hidden="true" />
+          }
         </button>
       </div>
     </form>

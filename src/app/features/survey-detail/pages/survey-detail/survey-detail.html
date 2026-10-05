@@ -53,16 +53,18 @@
                 <div class="answer-list">
                   @for (option of question.options; track option.id) {
                     <label
-                    class="answer-option"
-                    [class.answer-option--selected]="isOptionSelected(question.id, option.id)"
-                    [class.answer-option--locked]="isPastSurvey() || isSubmitting() || hasCompletedSurvey()"
-                    (click)="selectAnswer(question, option.id, $event)"
-                  >
-                    <input
-                      [type]="question.allowMultiple ? 'checkbox' : 'radio'"
-                      [checked]="isOptionSelected(question.id, option.id)"
-                      [disabled]="isPastSurvey() || isSubmitting() || hasCompletedSurvey()"
-                    />
+                      class="answer-option"
+                      [class.answer-option--selected]="isOptionSelected(question.id, option.id)"
+                      [class.answer-option--locked]="
+                        isPastSurvey() || isSubmitting() || hasCompletedSurvey()
+                      "
+                      (click)="selectAnswer(question, option.id, $event)"
+                    >
+                      <input
+                        [type]="question.allowMultiple ? 'checkbox' : 'radio'"
+                        [checked]="isOptionSelected(question.id, option.id)"
+                        [disabled]="isPastSurvey() || isSubmitting() || hasCompletedSurvey()"
+                      />
 
                       <span>{{ option.text }}</span>
                     </label>
@@ -90,7 +92,7 @@
               Complete survey
             }
           </button>
-        
+
           <div class="submit-message-space" aria-live="polite">
             @if (errorMessage()) {
               <p class="submit-message submit-message--error">
