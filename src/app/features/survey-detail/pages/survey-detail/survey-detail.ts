@@ -56,6 +56,10 @@ export class SurveyDetail implements OnDestroy {
     return this.votes().length > 0;
   });
 
+  readonly hasVisibleResults = computed<boolean>(() => {
+    return this.hasVotes() || this.hasSelectedAnswers();
+  });
+
   readonly isPastSurvey = computed<boolean>(() => {
     const currentSurvey = this.survey();
 
@@ -144,16 +148,21 @@ export class SurveyDetail implements OnDestroy {
   }
 
   /**
-   * Updates the selected answers when a radio button or checkbox changes.
+   * Selects an answer immediately when the participant clicks or taps an option.
    */
-  handleAnswerChange(question: SurveyQuestion, optionId: string, event: Event): void {
-    if (this.hasCompletedSurvey()) {
+  selectAnswer(question: SurveyQuestion, optionId: string, event: MouseEvent): void {
+    event.preventDefault();
+
+    if (this.isPastSurvey() || this.isSubmitting() || this.hasCompletedSurvey()) {
       return;
     }
-    const inputElement = event.target as HTMLInputElement;
 
     if (question.allowMultiple) {
-      this.toggleMultipleChoiceAnswer(question.id, optionId, inputElement.checked);
+      this.toggleMultipleChoiceAnswer(
+        question.id,
+        optionId,
+        !this.isOptionSelected(question.id, optionId),
+      );
       return;
     }
 
@@ -187,13 +196,13 @@ export class SurveyDetail implements OnDestroy {
    * Calculates the vote percentage for a single option.
    */
   getVotePercentage(questionId: string, optionId: string): number {
-    const totalAnswersForQuestion = this.getTotalAnswersForQuestion(questionId);
+    const totalAnswersForQuestion = this.getVisibleTotalAnswersForQuestion(questionId);
 
     if (totalAnswersForQuestion === 0) {
       return 0;
     }
 
-    const optionVoteCount = this.getOptionVoteCount(questionId, optionId);
+    const optionVoteCount = this.getVisibleOptionVoteCount(questionId, optionId);
 
     return Math.round((optionVoteCount / totalAnswersForQuestion) * 100);
   }
@@ -331,6 +340,34 @@ this.hasCompletedSurvey.set(true);
       void this.loadVotes(surveyId);
     });
   }
+
+    /**
+   * Checks whether the participant has selected at least one answer.
+   */
+    private hasSelectedAnswers(): boolean {
+      return Object.values(this.selectedAnswers()).some(
+        (selectedOptionIds: string[]) => selectedOptionIds.length > 0,
+      );
+    }
+  
+    /**
+     * Counts saved votes plus the participant's current selection for one question.
+     */
+    private getVisibleTotalAnswersForQuestion(questionId: string): number {
+      const selectedOptionIds = this.selectedAnswers()[questionId] ?? [];
+  
+      return this.getTotalAnswersForQuestion(questionId) + selectedOptionIds.length;
+    }
+  
+    /**
+     * Counts saved votes plus the participant's current selection for one option.
+     */
+    private getVisibleOptionVoteCount(questionId: string, optionId: string): number {
+      const selectedOptionIds = this.selectedAnswers()[questionId] ?? [];
+      const selectedOptionCount = selectedOptionIds.includes(optionId) ? 1 : 0;
+  
+      return this.getOptionVoteCount(questionId, optionId) + selectedOptionCount;
+    }
 
   /**
    * Creates the vote answer payload from the currently selected options.

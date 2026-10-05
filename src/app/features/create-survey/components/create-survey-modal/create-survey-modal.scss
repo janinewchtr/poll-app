@@ -16,9 +16,11 @@
   position: relative;
   z-index: 1;
   width: min(100% - 48px, 1280px);
-  max-height: calc(100vh - 64px);
-  overflow-y: auto;
-  padding: 42px 56px 40px;
+  height: calc(100vh - 64px);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+  padding: 42px 56px 0;
   color: var(--color-text-light);
   background: var(--color-bg-app);
   border-radius: 0 110px 0 0;
@@ -96,14 +98,19 @@ h2 {
 }
 
 .survey-form {
+  min-height: 0;
   display: grid;
-  gap: 28px;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 0;
+  overflow: hidden;
 }
 
 .form-panel {
   padding: 42px 34px 48px;
   background: var(--color-bg-panel-dark);
   border-radius: 0 88px 0 0;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .survey-basics {
@@ -328,6 +335,7 @@ input {
   font-weight: 500;
   line-height: 1;
   white-space: nowrap;
+  cursor: pointer;
 }
 
 .checkbox-field input {
@@ -422,15 +430,18 @@ input {
 }
 
 .modal-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  min-height: 72px;
-}
+    min-height: 72px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) max-content;
+    align-items: center;
+    gap: 24px;
+    padding: 14px 0 18px;
+    background: var(--color-bg-app);
+  }
 
 .submit-error {
     min-height: 20px;
-    margin: 0 auto 0 0;
+    margin: 0;
     color: var(--color-primary-orange);
     font-size: 16px;
     font-weight: 800;
@@ -809,12 +820,11 @@ button:focus-visible {
   .create-survey-modal {
     width: 100%;
     max-width: 100vw;
-    min-height: 100vh;
+    height: 100vh;
     max-height: none;
     margin: 0;
     overflow-x: hidden;
-    overflow-y: visible;
-    padding: 24px 16px 28px;
+    padding: 24px 16px 0;
     border-radius: 0;
     box-shadow: none;
   }
@@ -933,13 +943,16 @@ button:focus-visible {
   }
 
   .modal-actions {
-    justify-content: center;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 12px;
     min-height: 72px;
   }
 
   .submit-error {
-    margin-right: 16px;
+    margin: 0;
     font-size: 16px;
+    text-align: center;
   }
 
   .publish-button {

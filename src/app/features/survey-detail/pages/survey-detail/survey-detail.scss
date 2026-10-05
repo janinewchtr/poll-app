@@ -168,15 +168,12 @@ h3 {
   cursor: pointer;
 }
 
-.answer-option:not(:has(input:disabled)):has(input:hover) {
+.answer-option:not(.answer-option--locked):hover {
   background: var(--color-secondary-orange);
 }
 
-.answer-option:not(:has(input:disabled)) input:hover {
-  background: var(--color-secondary-orange);
-}
-
-.answer-option input:checked {
+.answer-option input:checked,
+.answer-option--selected input {
   border-color: var(--color-primary-orange);
   background-color: var(--color-primary-orange);
   background-image: url('../../../../../../public/assets/check.svg');
@@ -185,17 +182,29 @@ h3 {
   background-size: 14px 14px;
 }
 
-.answer-option:has(input:checked) {
+@media (hover: none) {
+  .answer-option:not(.answer-option--locked):hover {
+    background: transparent;
+  }
+}
+
+.answer-option--selected:not(.answer-option--locked) input {
+  background-color: var(--color-primary-orange);
+  background-image: url('../../../../../../public/assets/check.svg');
+}
+
+.answer-option:has(input:checked),
+.answer-option--selected {
   background: transparent;
 }
 
 .answer-option:has(input:disabled) {
-  cursor: default;
+  cursor: not-allowed;
 }
 
 .answer-option input:disabled {
   opacity: 0.45;
-  cursor: default;
+  cursor: not-allowed;
 }
 
 .answer-option input:disabled + span {
@@ -343,6 +352,7 @@ h3 {
   display: block;
   border-radius: 999px;
   background: var(--color-result-fill);
+  transition: width 180ms ease;
 }
 
 .result-row__percent {
