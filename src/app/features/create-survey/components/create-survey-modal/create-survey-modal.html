@@ -55,7 +55,7 @@
                 <span>Set end date <em>(optional)</em></span>
 
                 <div class="field-with-icon">
-                  <input type="date" formControlName="deadline" />
+                  <input type="date" formControlName="deadline" [min]="minimumDeadlineDate" />
 
                   <button
                     type="button"
@@ -69,8 +69,6 @@
               </label>
 
               <div class="form-field form-field--category">
-                <span>Choose category</span>
-
                 <div class="create-category-filter">
                   <button
                     type="button"
@@ -81,20 +79,21 @@
                     aria-haspopup="listbox"
                     (click)="toggleCategoryMenu($event)"
                   >
-                    <span>{{ selectedCategoryLabel() }}</span>
+                    <span>Choose category</span>
+
                     <span class="category-filter__icons" aria-hidden="true">
-                        <img
-                          class="category-filter__icon category-filter__icon--white"
-                          src="assets/arrow_drop_down-white.svg"
-                          alt=""
-                        />
-                      
-                        <img
-                          class="category-filter__icon category-filter__icon--orange"
-                          src="assets/arrow_drop_down_down_orange.svg"
-                          alt=""
-                        />
-                      </span>
+                      <img
+                        class="category-filter__icon category-filter__icon--white"
+                        src="assets/arrow_drop_down-white.svg"
+                        alt=""
+                      />
+
+                      <img
+                        class="category-filter__icon category-filter__icon--orange"
+                        src="assets/arrow_drop_down_down_orange.svg"
+                        alt=""
+                      />
+                    </span>
                   </button>
 
                   @if (isCategoryMenuOpen()) {
@@ -113,6 +112,11 @@
                     </ul>
                   }
                 </div>
+                <p class="create-category-filter__selected">
+                  @if (selectedCategory()) {
+                    {{ selectedCategory() }}
+                  }
+                </p>
                 <div class="field-error">
                   @if (form.controls.category.touched && form.controls.category.invalid) {
                     Category is required.

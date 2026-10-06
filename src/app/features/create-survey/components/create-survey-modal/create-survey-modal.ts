@@ -90,6 +90,7 @@ export class CreateSurveyModal implements OnInit, OnDestroy {
   readonly createdSurveyId = signal<string | null>(null);
   readonly isCategoryMenuOpen = signal<boolean>(false);
   readonly selectedCategory = signal<string>('');
+  readonly minimumDeadlineDate = this.getMinimumDeadlineDate();
 
   readonly showPublishedOverlay = computed<boolean>(() => {
     return this.createdSurveyId() !== null;
@@ -143,6 +144,21 @@ export class CreateSurveyModal implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.clearPublishedOverlayTimeout();
     this.document.body.style.overflow = this.previousBodyOverflow;
+  }
+
+  /**
+   * Returns tomorrow's date in the yyyy-mm-dd format required by date inputs.
+   */
+  private getMinimumDeadlineDate(): string {
+    const tomorrow = new Date();
+
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const year = tomorrow.getFullYear();
+    const month = String(tomorrow.getMonth() + 1).padStart(2, '0');
+    const day = String(tomorrow.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
   }
 
   /**
@@ -201,15 +217,17 @@ export class CreateSurveyModal implements OnInit, OnDestroy {
   }
 
   /**
-   * Removes a question or clears the first one so at least one question remains.
+   * Removes a question and keeps one editable question in the form.
    */
   removeQuestion(questionIndex: number): void {
-    if (questionIndex === 0) {
-      this.clearQuestion(this.form.controls.questions.at(0));
+    const questions = this.form.controls.questions;
+
+    if (questions.length === 1) {
+      this.clearQuestion(questions.at(0));
       return;
     }
 
-    this.form.controls.questions.removeAt(questionIndex);
+    questions.removeAt(questionIndex);
   }
 
   /**

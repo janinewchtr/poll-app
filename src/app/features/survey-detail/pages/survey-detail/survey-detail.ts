@@ -47,6 +47,7 @@ export class SurveyDetail implements OnDestroy {
   readonly selectedAnswers = signal<Record<string, string[]>>({});
   readonly isCreateSurveyModalOpen = signal<boolean>(false);
   readonly hasCompletedSurvey = signal<boolean>(false);
+  readonly isResultsPanelOpen = signal<boolean>(true);
 
   readonly questions = computed<SurveyQuestion[]>(() => {
     return this.survey()?.questions ?? [];
@@ -123,6 +124,13 @@ export class SurveyDetail implements OnDestroy {
     this.isCreateSurveyModalOpen.set(false);
     await this.router.navigate(['/surveys', surveyId]);
     await this.loadSurveyPage();
+  }
+
+  /**
+   * Toggles the visibility of the survey results panel on mobile screens.
+   */
+  toggleResultsPanel(): void {
+    this.isResultsPanelOpen.update((isOpen: boolean) => !isOpen);
   }
 
   /**

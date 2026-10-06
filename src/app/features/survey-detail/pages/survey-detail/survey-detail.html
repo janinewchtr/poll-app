@@ -4,8 +4,19 @@
       <img class="detail-header__logo" src="assets/pollapp_logo_darkpruple.svg" alt="Poll App" />
     </a>
 
-    <button type="button" class="primary-button" (click)="openCreateSurveyModal()">
-      Create survey
+    <button
+      type="button"
+      class="primary-button detail-header__create-button"
+      (click)="openCreateSurveyModal()"
+    >
+      <span>Create survey</span>
+
+      <img
+        class="detail-header__create-button-icon"
+        src="assets/add_circle_darkprple.svg"
+        alt=""
+        aria-hidden="true"
+      />
     </button>
   </header>
 
@@ -107,46 +118,62 @@
         </div>
       </article>
 
-      <aside class="results-panel">
-        <h2>
-          Survey results
-          <span>LIVE</span>
-        </h2>
+      <aside class="results-panel" [class.results-panel--closed]="!isResultsPanelOpen()">
+        <button
+          type="button"
+          class="results-panel__toggle"
+          [attr.aria-expanded]="isResultsPanelOpen()"
+          aria-controls="survey-results-content"
+          (click)="toggleResultsPanel()"
+        >
+          <span>
+            {{ isResultsPanelOpen() ? 'Close results' : 'Open results' }}
+          </span>
 
-        @if (hasVisibleResults()) {
-          <div class="results-list">
-            @for (question of questions(); track question.id; let questionIndex = $index) {
-              <section class="result-question">
-                <h3>{{ questionIndex + 1 }}. {{ question.text }}</h3>
+          <span class="results-panel__toggle-icon" aria-hidden="true"></span>
+        </button>
 
-                <div class="result-options">
-                  @for (option of question.options; track option.id; let optionIndex = $index) {
-                    <div class="result-row">
-                      <span class="result-row__label">
-                        {{ getOptionLabel(optionIndex) }}
-                      </span>
+        <div id="survey-results-content" class="results-panel__content">
+          <h2>
+            Survey results
+            <span>LIVE</span>
+          </h2>
 
-                      <div class="result-row__track">
-                        <span
-                          class="result-row__fill"
-                          [style.width.%]="getVotePercentage(question.id, option.id)"
-                        ></span>
+          @if (hasVisibleResults()) {
+            <div class="results-list">
+              @for (question of questions(); track question.id; let questionIndex = $index) {
+                <section class="result-question">
+                  <h3>{{ questionIndex + 1 }}. {{ question.text }}</h3>
+
+                  <div class="result-options">
+                    @for (option of question.options; track option.id; let optionIndex = $index) {
+                      <div class="result-row">
+                        <span class="result-row__label">
+                          {{ getOptionLabel(optionIndex) }}
+                        </span>
+
+                        <div class="result-row__track">
+                          <span
+                            class="result-row__fill"
+                            [style.width.%]="getVotePercentage(question.id, option.id)"
+                          ></span>
+                        </div>
+
+                        <span class="result-row__percent">
+                          {{ getVotePercentage(question.id, option.id) }}%
+                        </span>
                       </div>
+                    }
+                  </div>
+                </section>
+              }
+            </div>
+          } @else {
+            <p>Results will be shown here after participants complete the survey.</p>
 
-                      <span class="result-row__percent">
-                        {{ getVotePercentage(question.id, option.id) }}%
-                      </span>
-                    </div>
-                  }
-                </div>
-              </section>
-            }
-          </div>
-        } @else {
-          <p>Results will be shown here after participants complete the survey.</p>
-
-          <strong>There are no answers yet.</strong>
-        }
+            <strong>There are no answers yet.</strong>
+          }
+        </div>
       </aside>
     </section>
   }
