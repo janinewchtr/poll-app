@@ -82,7 +82,19 @@
                     (click)="toggleCategoryMenu($event)"
                   >
                     <span>{{ selectedCategoryLabel() }}</span>
-                    <img src="assets/arrow_drop_down_orange.svg" alt="" />
+                    <span class="category-filter__icons" aria-hidden="true">
+                        <img
+                          class="category-filter__icon category-filter__icon--white"
+                          src="assets/arrow_drop_down-white.svg"
+                          alt=""
+                        />
+                      
+                        <img
+                          class="category-filter__icon category-filter__icon--orange"
+                          src="assets/arrow_drop_down_down_orange.svg"
+                          alt=""
+                        />
+                      </span>
                   </button>
 
                   @if (isCategoryMenuOpen()) {

@@ -9,7 +9,6 @@ import { CreateSurveyModal } from '../../../create-survey/components/create-surv
 type SurveyTab = 'active' | 'past';
 
 const ALL_SURVEYS = 'All Surveys';
-const DAYS_VISIBLE_AS_ENDING_SOON = 7;
 const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
 
 /**
@@ -48,15 +47,9 @@ export class Home {
   });
 
   readonly endingSoonSurveys = computed<Survey[]>(() => {
-    const now = Date.now();
-    const endingSoonLimit = now + DAYS_VISIBLE_AS_ENDING_SOON * MILLISECONDS_PER_DAY;
-
     return this.surveys()
       .filter((survey: Survey) => !this.isPastSurvey(survey))
-      .filter((survey: Survey) => {
-        const deadlineTime = this.getDeadlineTime(survey);
-        return deadlineTime >= now && deadlineTime <= endingSoonLimit;
-      })
+      .filter((survey: Survey) => survey.deadline !== null)
       .sort(
         (firstSurvey: Survey, secondSurvey: Survey) =>
           this.getDeadlineTime(firstSurvey) - this.getDeadlineTime(secondSurvey),

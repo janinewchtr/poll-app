@@ -23,6 +23,8 @@
       </div>
 
       <div class="hero-visual" aria-hidden="true">
+        <div class="hero-visual__phone-hitbox"></div>
+
         <img class="hero-visual__phone" src="assets/animation_picture.png" alt="" />
 
         <img class="hero-visual__bubble" src="assets/animation_typing_bubble.svg" alt="" />
@@ -91,7 +93,18 @@
             (click)="toggleCategoryMenu()"
           >
             <span>Sort by categories</span>
-            <img src="assets/arrow_drop_down_orange.svg" alt="" />
+            <span class="category-filter__icons" aria-hidden="true">
+              <img
+                class="category-filter__icon category-filter__icon--white"
+                src="assets/arrow_drop_down-white.svg"
+                alt=""
+              />
+              <img
+                class="category-filter__icon category-filter__icon--orange"
+                src="assets/arrow_drop_down_down_orange.svg"
+                alt=""
+              />
+            </span>
           </button>
 
           @if (isCategoryMenuOpen()) {
