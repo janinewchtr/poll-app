@@ -65,7 +65,7 @@ h1 {
   padding: 0 18px;
   color: var(--color-text-dark);
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 700;
   background: var(--color-secondary-orange);
   cursor: pointer;
 }
@@ -134,7 +134,9 @@ h1 {
 
 .hero-visual__phone {
   z-index: 3;
-  transform: translate(0, 0) rotate(0deg) scale(1);
+  transform: scale(1.22);
+  transform-origin: center;
+  filter: drop-shadow(8px 12px 10px rgba(0, 0, 0, 0.22));
 }
 
 .hero-visual__bubble {
@@ -169,28 +171,23 @@ h1 {
   transform: translate(0, 0) scale(1);
 }
 
-.hero-visual__phone-hitbox:hover ~ .hero-visual__phone {
-  transform: translate(32px, -14px) rotate(2deg) scale(0.96);
-  filter: drop-shadow(8px 12px 10px rgba(0, 0, 0, 0.22));
-}
-
 .hero-visual__phone-hitbox:hover ~ .hero-visual__bubble {
-  transform: translate(20px, 38px) rotate(-4deg) scale(1.14);
+  transform: translate(-46px, -24px) rotate(-6deg) scale(0.96);
   filter: drop-shadow(6px 8px 8px rgba(0, 0, 0, 0.18));
 }
 
 .hero-visual__phone-hitbox:hover ~ .hero-visual__question {
-  transform: translate(48px, -28px) scale(1.12);
+  transform: translate(26px, -32px) scale(0.92);
   filter: drop-shadow(6px 8px 8px rgba(0, 0, 0, 0.2));
 }
 
 .hero-visual__phone-hitbox:hover ~ .hero-visual__star {
-  transform: translate(62px, 10px) rotate(-8deg) scale(1.12);
+  transform: translate(-70px, 36px) rotate(-8deg) scale(0.92);
   filter: drop-shadow(6px 8px 8px rgba(0, 0, 0, 0.18));
 }
 
 .hero-visual__phone-hitbox:hover ~ .hero-visual__check {
-  transform: translate(78px, -4px) scale(1.18);
+  transform: translate(28px, 38px) scale(0.94);
   filter: drop-shadow(6px 8px 8px rgba(0, 0, 0, 0.2));
 }
 
@@ -254,7 +251,7 @@ h1 {
   margin-top: 12px;
   color: var(--color-text-dark);
   font-size: 24px;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.15;
 }
 
@@ -323,7 +320,8 @@ h1 {
   padding: 0 18px;
   color: var(--color-text-light);
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 700;
+  font-family: var(--font-family-base);
   background: transparent;
   cursor: pointer;
   transition:
@@ -454,7 +452,7 @@ h1 {
   margin-top: 8px;
   color: var(--color-text-light);
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.2;
 }
 
@@ -839,31 +837,6 @@ h1 {
     width: 58px;
     right: 16px;
     bottom: 68px;
-  }
-
-  .hero-visual__phone-hitbox:hover ~ .hero-visual__phone {
-    transform: translate(0, 0) rotate(0deg) scale(1);
-    filter: none;
-  }
-
-  .hero-visual__phone-hitbox:hover ~ .hero-visual__bubble {
-    transform: translate(0, 0) rotate(-10deg) scale(1);
-    filter: none;
-  }
-
-  .hero-visual__phone-hitbox:hover ~ .hero-visual__question {
-    transform: translate(0, 0) scale(1);
-    filter: none;
-  }
-
-  .hero-visual__phone-hitbox:hover ~ .hero-visual__star {
-    transform: translate(0, 0) rotate(0deg) scale(1);
-    filter: none;
-  }
-
-  .hero-visual__phone-hitbox:hover ~ .hero-visual__check {
-    transform: translate(0, 0) scale(1);
-    filter: none;
   }
 
   .hero__text p {

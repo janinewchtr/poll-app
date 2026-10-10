@@ -1,3 +1,15 @@
+import {
+  areAllQuestionsAnswered,
+  calculateVotePercentage,
+  createVoteAnswers,
+  hasSelectedAnswers,
+  hasStoredVote,
+  normalizeSurveyQuestions,
+  storeCompletedSurvey,
+  toggleSelectedOption,
+  SurveyWithRawQuestions,
+} from './survey-detail.helpers';
+
 import { Component, OnDestroy, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
@@ -11,13 +23,7 @@ import { ParticipantService } from '../../../../core/services/participant.servic
 import { SupabaseService } from '../../../../core/services/supabase.service';
 import { CreateSurveyModal } from '../../../create-survey/components/create-survey-modal/create-survey-modal';
 
-type SurveyWithRawQuestions = Omit<Survey, 'questions'> & {
-  questions: SurveyQuestion[] | string | null;
-};
-
 type VotesSubscription = ReturnType<SupabaseService['subscribeToSurveyVotes']>;
-
-const VOTED_SURVEY_STORAGE_PREFIX = 'poll-app-voted-survey-';
 
 /**
  * Shows one survey, handles vote submission and displays realtime result updates.
@@ -57,8 +63,12 @@ export class SurveyDetail implements OnDestroy {
     return this.votes().length > 0;
   });
 
-  readonly hasVisibleResults = computed<boolean>(() => {
-    return this.hasVotes() || this.hasSelectedAnswers();
+  readonly canSubmitSurvey = computed<boolean>(() => {
+    if (this.isSurveyLocked()) {
+      return false;
+    }
+
+    return areAllQuestionsAnswered(this.questions(), this.selectedAnswers());
   });
 
   readonly isPastSurvey = computed<boolean>(() => {
@@ -75,22 +85,16 @@ export class SurveyDetail implements OnDestroy {
     return this.isPastSurvey() ? 'Past survey' : 'Published';
   });
 
-  readonly canSubmitSurvey = computed<boolean>(() => {
-    if (this.isPastSurvey() || this.isSubmitting() || this.hasCompletedSurvey()) {
-      return false;
-    }
-
-    const questions = this.questions();
-
-    if (questions.length === 0) {
-      return false;
-    }
-
-    return questions.every((question: SurveyQuestion) => {
-      const selectedOptionIds = this.selectedAnswers()[question.id] ?? [];
-      return selectedOptionIds.length > 0;
-    });
+  readonly hasVisibleResults = computed<boolean>(() => {
+    return this.hasVotes() || hasSelectedAnswers(this.selectedAnswers());
   });
+
+  /**
+   * Checks whether the survey cannot receive new answers.
+   */
+  private isSurveyLocked(): boolean {
+    return this.isPastSurvey() || this.isSubmitting() || this.hasCompletedSurvey();
+  }
 
   constructor() {
     void this.loadSurveyPage();
@@ -166,17 +170,20 @@ export class SurveyDetail implements OnDestroy {
     }
 
     if (question.allowMultiple) {
-      this.toggleMultipleChoiceAnswer(
-        question.id,
-        optionId,
-        !this.isOptionSelected(question.id, optionId),
-      );
+      this.toggleMultipleChoiceAnswer(question.id, optionId);
       return;
     }
 
+    this.selectSingleChoiceAnswer(question.id, optionId);
+  }
+
+  /**
+   * Stores one selected option for a single-choice question.
+   */
+  private selectSingleChoiceAnswer(questionId: string, optionId: string): void {
     this.selectedAnswers.update((currentAnswers: Record<string, string[]>) => ({
       ...currentAnswers,
-      [question.id]: [optionId],
+      [questionId]: [optionId],
     }));
   }
 
@@ -204,15 +211,7 @@ export class SurveyDetail implements OnDestroy {
    * Calculates the vote percentage for a single option.
    */
   getVotePercentage(questionId: string, optionId: string): number {
-    const totalAnswersForQuestion = this.getVisibleTotalAnswersForQuestion(questionId);
-
-    if (totalAnswersForQuestion === 0) {
-      return 0;
-    }
-
-    const optionVoteCount = this.getVisibleOptionVoteCount(questionId, optionId);
-
-    return Math.round((optionVoteCount / totalAnswersForQuestion) * 100);
+    return calculateVotePercentage(questionId, optionId, this.votes(), this.selectedAnswers());
   }
 
   /**
@@ -246,7 +245,7 @@ export class SurveyDetail implements OnDestroy {
     await this.supabaseService.createVote({
       survey_id: surveyId,
       participant_id: this.participantService.getParticipantId(),
-      answers: this.createVoteAnswers(),
+      answers: createVoteAnswers(this.questions(), this.selectedAnswers()),
     });
   }
 
@@ -254,7 +253,7 @@ export class SurveyDetail implements OnDestroy {
    * Shows success feedback, clears answers and refreshes the vote results.
    */
   private async handleVoteSubmitSuccess(surveyId: string): Promise<void> {
-    this.storeCompletedSurvey(surveyId);
+    storeCompletedSurvey(surveyId);
     this.hasCompletedSurvey.set(true);
     this.successMessage.set('Your vote has been submitted.');
     this.selectedAnswers.set({});
@@ -281,21 +280,28 @@ export class SurveyDetail implements OnDestroy {
    */
   private async loadSurvey(surveyId: string): Promise<void> {
     try {
-      this.startSurveyLoading();
-
-      const survey = await this.supabaseService.getSurveyById(surveyId);
-
-      if (!survey) {
-        this.handleMissingSurvey();
-        return;
-      }
-
-      await this.setLoadedSurvey(survey);
+      await this.loadSurveySafely(surveyId);
     } catch {
       this.errorMessage.set('Survey could not be loaded.');
     } finally {
       this.isLoading.set(false);
     }
+  }
+
+  /**
+   * Loads one survey and stores it when it exists.
+   */
+  private async loadSurveySafely(surveyId: string): Promise<void> {
+    this.startSurveyLoading();
+
+    const survey = await this.supabaseService.getSurveyById(surveyId);
+
+    if (!survey) {
+      this.handleMissingSurvey();
+      return;
+    }
+
+    await this.setLoadedSurvey(survey);
   }
 
   /**
@@ -319,10 +325,10 @@ export class SurveyDetail implements OnDestroy {
    * Stores the loaded survey, clears old selections and starts realtime vote updates.
    */
   private async setLoadedSurvey(survey: Survey): Promise<void> {
-    const normalizedSurvey = this.normalizeSurveyQuestions(survey as SurveyWithRawQuestions);
+    const normalizedSurvey = normalizeSurveyQuestions(survey as SurveyWithRawQuestions);
 
     this.survey.set(normalizedSurvey);
-    this.hasCompletedSurvey.set(this.hasStoredVote(normalizedSurvey.id));
+    this.hasCompletedSurvey.set(hasStoredVote(normalizedSurvey.id));
     this.selectedAnswers.set({});
     this.successMessage.set(null);
 
@@ -350,173 +356,11 @@ export class SurveyDetail implements OnDestroy {
   }
 
   /**
-   * Checks whether the participant has selected at least one answer.
-   */
-  private hasSelectedAnswers(): boolean {
-    return Object.values(this.selectedAnswers()).some(
-      (selectedOptionIds: string[]) => selectedOptionIds.length > 0,
-    );
-  }
-
-  /**
-   * Counts saved votes plus the participant's current selection for one question.
-   */
-  private getVisibleTotalAnswersForQuestion(questionId: string): number {
-    const selectedOptionIds = this.selectedAnswers()[questionId] ?? [];
-
-    return this.getTotalAnswersForQuestion(questionId) + selectedOptionIds.length;
-  }
-
-  /**
-   * Counts saved votes plus the participant's current selection for one option.
-   */
-  private getVisibleOptionVoteCount(questionId: string, optionId: string): number {
-    const selectedOptionIds = this.selectedAnswers()[questionId] ?? [];
-    const selectedOptionCount = selectedOptionIds.includes(optionId) ? 1 : 0;
-
-    return this.getOptionVoteCount(questionId, optionId) + selectedOptionCount;
-  }
-
-  /**
-   * Creates the vote answer payload from the currently selected options.
-   */
-  private createVoteAnswers(): VoteAnswer[] {
-    return this.questions().map((question: SurveyQuestion) => ({
-      questionId: question.id,
-      optionIds: this.selectedAnswers()[question.id] ?? [],
-    }));
-  }
-
-  /**
-   * Counts all selected answers for one question across all votes.
-   */
-  private getTotalAnswersForQuestion(questionId: string): number {
-    return this.votes().reduce((totalAnswers: number, vote: SurveyVote) => {
-      const answer = this.findVoteAnswer(vote, questionId);
-      return totalAnswers + (answer?.optionIds.length ?? 0);
-    }, 0);
-  }
-
-  /**
-   * Counts how often one option was selected for one question.
-   */
-  private getOptionVoteCount(questionId: string, optionId: string): number {
-    return this.votes().reduce((voteCount: number, vote: SurveyVote) => {
-      const answer = this.findVoteAnswer(vote, questionId);
-
-      if (!answer) {
-        return voteCount;
-      }
-
-      return answer.optionIds.includes(optionId) ? voteCount + 1 : voteCount;
-    }, 0);
-  }
-
-  /**
-   * Finds the answer for one question inside a vote.
-   */
-  private findVoteAnswer(vote: SurveyVote, questionId: string): VoteAnswer | undefined {
-    return vote.answers.find((answer: VoteAnswer) => answer.questionId === questionId);
-  }
-
-  /**
-   * Normalizes survey question data that may come from the database as a JSON string.
-   */
-  private normalizeSurveyQuestions(survey: SurveyWithRawQuestions): Survey {
-    return {
-      ...survey,
-      questions: this.parseQuestions(survey.questions),
-    };
-  }
-
-  /**
-   * Returns parsed question data or an empty list when no valid questions are available.
-   */
-  private parseQuestions(questions: SurveyQuestion[] | string | null): SurveyQuestion[] {
-    if (Array.isArray(questions)) {
-      return questions;
-    }
-
-    if (!questions) {
-      return [];
-    }
-
-    return this.parseQuestionString(questions);
-  }
-
-  /**
-   * Parses a stored question JSON string into survey questions.
-   */
-  private parseQuestionString(questions: string): SurveyQuestion[] {
-    try {
-      const parsedQuestions: unknown = JSON.parse(questions);
-      return this.filterSurveyQuestions(parsedQuestions);
-    } catch {
-      return [];
-    }
-  }
-
-  /**
-   * Filters parsed JSON values down to valid survey questions.
-   */
-  private filterSurveyQuestions(questions: unknown): SurveyQuestion[] {
-    if (!Array.isArray(questions)) {
-      return [];
-    }
-
-    return questions.filter((question: unknown): question is SurveyQuestion =>
-      this.isSurveyQuestion(question),
-    );
-  }
-
-  /**
-   * Checks whether an unknown value has the minimum shape of a survey question.
-   */
-  private isSurveyQuestion(question: unknown): question is SurveyQuestion {
-    if (!question || typeof question !== 'object') {
-      return false;
-    }
-
-    const possibleQuestion = question as Partial<SurveyQuestion>;
-
-    return (
-      typeof possibleQuestion.id === 'string' &&
-      typeof possibleQuestion.text === 'string' &&
-      typeof possibleQuestion.allowMultiple === 'boolean' &&
-      Array.isArray(possibleQuestion.options)
-    );
-  }
-
-  /**
    * Adds or removes one option id from a multiple-choice answer.
    */
-  private toggleMultipleChoiceAnswer(
-    questionId: string,
-    optionId: string,
-    isChecked: boolean,
-  ): void {
-    this.selectedAnswers.update((currentAnswers: Record<string, string[]>) => {
-      const currentQuestionAnswers = currentAnswers[questionId] ?? [];
-
-      const nextQuestionAnswers = isChecked
-        ? [...currentQuestionAnswers, optionId]
-        : currentQuestionAnswers.filter((currentOptionId: string) => currentOptionId !== optionId);
-
-      return {
-        ...currentAnswers,
-        [questionId]: nextQuestionAnswers,
-      };
-    });
-  }
-  private hasStoredVote(surveyId: string): boolean {
-    return localStorage.getItem(this.getCompletedSurveyStorageKey(surveyId)) === 'true';
-  }
-
-  private storeCompletedSurvey(surveyId: string): void {
-    localStorage.setItem(this.getCompletedSurveyStorageKey(surveyId), 'true');
-  }
-
-  private getCompletedSurveyStorageKey(surveyId: string): string {
-    return `${VOTED_SURVEY_STORAGE_PREFIX}${surveyId}`;
+  private toggleMultipleChoiceAnswer(questionId: string, optionId: string): void {
+    this.selectedAnswers.update((currentAnswers: Record<string, string[]>) =>
+      toggleSelectedOption(currentAnswers, questionId, optionId),
+    );
   }
 }

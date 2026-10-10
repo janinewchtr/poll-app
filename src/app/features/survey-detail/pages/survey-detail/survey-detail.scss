@@ -33,7 +33,7 @@
   padding: 0 20px;
   color: var(--color-text-dark);
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 700;
   background: var(--color-primary-orange);
 }
 
@@ -108,7 +108,7 @@
   padding: 4px 10px;
   color: var(--color-text-dark);
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1;
   background: var(--color-primary-orange);
 }
@@ -121,6 +121,7 @@ h3 {
 
 .survey-card h1 {
   max-width: 520px;
+  margin-bottom: 42px;
   color: var(--color-primary-orange);
   font-family: var(--font-family-display);
   font-size: 48px;
@@ -131,7 +132,7 @@ h3 {
 
 .survey-card__description {
   max-width: 610px;
-  margin: 18px 0 42px;
+  margin: -24px 0 42px;
   color: var(--color-text-dark);
   font-size: 16px;
   font-weight: 500;
@@ -158,7 +159,7 @@ h3 {
   padding: 0;
   color: var(--color-text-dark);
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.2;
 }
 
@@ -260,7 +261,7 @@ h3 {
   padding: 0 16px;
   color: var(--color-text-dark);
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 700;
   background: var(--color-secondary-orange);
   cursor: pointer;
   transition: background-color 160ms ease;
@@ -292,7 +293,7 @@ h3 {
   margin: 0;
   color: var(--color-text-dark);
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.2;
   text-align: right;
 }
@@ -373,7 +374,7 @@ h3 {
 .result-row__label {
   color: var(--color-text-dark);
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .result-row__track {
@@ -548,7 +549,7 @@ h3 {
   }
 
   .survey-card__description {
-    margin-bottom: 34px;
+    margin: -20px 0 34px;
   }
 
   .question-grid {
@@ -620,7 +621,7 @@ h3 {
   }
 
   .survey-card__description {
-    margin: 14px 0 28px;
+    margin: -14px 0 28px;
     font-size: 16px;
   }
 
@@ -691,7 +692,7 @@ h3 {
     padding: 0;
     color: var(--color-text-dark);
     font-size: 20px;
-    font-weight: 800;
+    font-weight: 700;
     background: transparent;
   }
 

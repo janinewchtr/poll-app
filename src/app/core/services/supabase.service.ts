@@ -30,17 +30,31 @@ export class SupabaseService {
    * Loads all published surveys and normalizes their question data for the app.
    */
   async getSurveys(): Promise<Survey[]> {
-    const { data, error } = await this.client
-      .from('surveys')
-      .select('*')
-      .eq('status', 'published')
-      .order('deadline', { ascending: true, nullsFirst: false });
+    const { data, error } = await this.getPublishedSurveyRows();
 
     if (error) {
       throw error;
     }
 
-    return (data ?? [])
+    return this.getVisibleSurveys(data ?? []);
+  }
+
+  /**
+   * Loads published survey rows ordered by deadline.
+   */
+  private getPublishedSurveyRows() {
+    return this.client
+      .from('surveys')
+      .select('*')
+      .eq('status', 'published')
+      .order('deadline', { ascending: true, nullsFirst: false });
+  }
+
+  /**
+   * Converts and filters visible survey rows.
+   */
+  private getVisibleSurveys(surveys: SurveyRow[]): Survey[] {
+    return surveys
       .map((survey: SurveyRow) => this.normalizeSurvey(survey))
       .filter((survey: Survey) => this.isSurveyStillVisible(survey));
   }
@@ -62,21 +76,20 @@ export class SupabaseService {
    * Loads a single survey by id and returns null when no matching survey exists.
    */
   async getSurveyById(id: string): Promise<Survey | null> {
-    const { data, error } = await this.client
-      .from('surveys')
-      .select('*')
-      .eq('id', id)
-      .maybeSingle();
+    const { data, error } = await this.getSurveyRowById(id);
 
     if (error) {
       throw error;
     }
 
-    if (!data) {
-      return null;
-    }
+    return data ? this.normalizeSurvey(data as SurveyRow) : null;
+  }
 
-    return this.normalizeSurvey(data as SurveyRow);
+  /**
+   * Loads one survey row by id from Supabase.
+   */
+  private getSurveyRowById(id: string) {
+    return this.client.from('surveys').select('*').eq('id', id).maybeSingle();
   }
 
   /**
@@ -136,17 +149,20 @@ export class SupabaseService {
   ): ReturnType<SupabaseClient['channel']> {
     return this.client
       .channel(`survey-votes-${surveyId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'votes',
-          filter: `survey_id=eq.${surveyId}`,
-        },
-        onChange,
-      )
+      .on('postgres_changes', this.createVoteChangeFilter(surveyId), onChange)
       .subscribe();
+  }
+
+  /**
+   * Creates the Supabase realtime filter for one survey's votes.
+   */
+  private createVoteChangeFilter(surveyId: string) {
+    return {
+      event: '*',
+      schema: 'public',
+      table: 'votes',
+      filter: `survey_id=eq.${surveyId}`,
+    } as const;
   }
 
   /**

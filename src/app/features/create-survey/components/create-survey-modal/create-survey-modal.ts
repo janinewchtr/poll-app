@@ -10,58 +10,28 @@ import {
   signal,
 } from '@angular/core';
 import {
-  AbstractControl,
   FormArray,
   FormBuilder,
   FormControl,
   FormGroup,
   ReactiveFormsModule,
-  ValidationErrors,
-  ValidatorFn,
   Validators,
 } from '@angular/forms';
 
 import { SURVEY_CATEGORIES } from '../../../../core/constants/survey-categories';
 import { CreateSurveyPayload } from '../../../../core/models/survey.model';
 import { SupabaseService } from '../../../../core/services/supabase.service';
-
-type CreateSurveyForm = FormGroup<{
-  title: FormControl<string>;
-  description: FormControl<string>;
-  category: FormControl<string>;
-  deadline: FormControl<string>;
-  questions: FormArray<QuestionForm>;
-}>;
-
-type QuestionForm = FormGroup<{
-  text: FormControl<string>;
-  allowMultiple: FormControl<boolean>;
-  options: FormArray<FormControl<string>>;
-}>;
-
-type QuestionFormValue = ReturnType<QuestionForm['getRawValue']>;
-type SurveyQuestionPayload = CreateSurveyPayload['questions'][number];
-type SurveyOptionPayload = SurveyQuestionPayload['options'][number];
+import {
+  containsLetterValidator,
+  CreateSurveyForm,
+  QuestionForm,
+  QuestionFormValue,
+  SurveyOptionPayload,
+  SurveyQuestionPayload,
+} from './create-survey-modal.helpers';
 
 const MAX_OPTIONS_PER_QUESTION = 6;
 const PUBLISHED_OVERLAY_VISIBLE_MS = 3000;
-
-const HAS_LETTER_PATTERN = /\p{L}/u;
-
-/**
- * Checks whether a text field contains at least one letter.
- */
-function containsLetterValidator(): ValidatorFn {
-  return (control: AbstractControl): ValidationErrors | null => {
-    const value = control.value;
-
-    if (typeof value !== 'string') {
-      return null;
-    }
-
-    return HAS_LETTER_PATTERN.test(value.trim()) ? null : { missingLetters: true };
-  };
-}
 
 /**
  * Displays the survey creation overlay and manages its reactive form state.
@@ -289,21 +259,42 @@ export class CreateSurveyModal implements OnInit, OnDestroy {
    */
   async submitSurvey(): Promise<void> {
     if (this.form.invalid) {
-      this.form.markAllAsTouched();
+      this.handleInvalidSubmit();
       return;
     }
 
-    try {
-      this.isSubmitting.set(true);
-      this.submitError.set(null);
+    await this.createSurvey();
+  }
 
-      const createdSurvey = await this.supabaseService.createSurvey(this.createSurveyPayload());
-      this.showPublishedOverlayFor(createdSurvey.id);
+  /**
+   * Marks all form fields after an invalid submit attempt.
+   */
+  private handleInvalidSubmit(): void {
+    this.form.markAllAsTouched();
+  }
+
+  /**
+   * Creates the survey and handles submit errors.
+   */
+  private async createSurvey(): Promise<void> {
+    try {
+      await this.createSurveySafely();
     } catch {
       this.submitError.set('Survey could not be created.');
     } finally {
       this.isSubmitting.set(false);
     }
+  }
+
+  /**
+   * Sends the survey payload and shows the published overlay.
+   */
+  private async createSurveySafely(): Promise<void> {
+    this.isSubmitting.set(true);
+    this.submitError.set(null);
+
+    const createdSurvey = await this.supabaseService.createSurvey(this.createSurveyPayload());
+    this.showPublishedOverlayFor(createdSurvey.id);
   }
 
   /**
@@ -336,10 +327,6 @@ export class CreateSurveyModal implements OnInit, OnDestroy {
     clearTimeout(this.publishedOverlayTimeoutId);
     this.publishedOverlayTimeoutId = null;
   }
-
-  /**
-   * Creates the default reactive form group for a new question.
-   */
 
   /**
    * Creates the default reactive form group for a new question.
