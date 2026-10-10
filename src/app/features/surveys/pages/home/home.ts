@@ -63,6 +63,8 @@ export class Home {
 
   /**
    * Closes the category dropdown when the user clicks outside of it.
+   *
+   * @param event - Document click event used to detect outside clicks.
    */
   @HostListener('document:click', ['$event'])
   closeCategoryMenuOnOutsideClick(event: MouseEvent): void {
@@ -96,6 +98,8 @@ export class Home {
 
   /**
    * Refreshes the list and navigates to the newly created survey.
+   *
+   * @param surveyId - Id of the newly created survey.
    */
   async handleSurveyCreated(surveyId: string): Promise<void> {
     await this.loadSurveys();
@@ -106,6 +110,8 @@ export class Home {
 
   /**
    * Switches between active and past surveys.
+   *
+   * @param tab - Survey tab that should become active.
    */
   setActiveTab(tab: SurveyTab): void {
     this.activeTab.set(tab);
@@ -115,6 +121,8 @@ export class Home {
 
   /**
    * Stores the selected category filter.
+   *
+   * @param category - Category selected by the user.
    */
   setSelectedCategory(category: string): void {
     this.selectedCategory.set(category);
@@ -129,6 +137,8 @@ export class Home {
 
   /**
    * Applies a category filter and closes the dropdown.
+   *
+   * @param category - Category selected in the dropdown.
    */
   selectCategory(category: string): void {
     this.setSelectedCategory(category);
@@ -137,6 +147,9 @@ export class Home {
 
   /**
    * Checks whether a survey deadline is already in the past.
+   *
+   * @param survey - Survey whose deadline should be checked.
+   * @returns Whether the survey is already past its deadline.
    */
   isPastSurvey(survey: Survey): boolean {
     if (!survey.deadline) {
@@ -148,6 +161,9 @@ export class Home {
 
   /**
    * Formats a deadline date for display in survey cards.
+   *
+   * @param deadline - Deadline date string or null when no deadline exists.
+   * @returns Formatted deadline label for the UI.
    */
   formatDeadline(deadline: string | null): string {
     if (!deadline) {
@@ -163,6 +179,9 @@ export class Home {
 
   /**
    * Builds the deadline badge text shown on survey cards.
+   *
+   * @param survey - Survey whose deadline badge should be created.
+   * @returns Deadline badge label for the survey card.
    */
   getDeadlineBadge(survey: Survey): string {
     if (!survey.deadline) {
@@ -197,6 +216,9 @@ export class Home {
 
   /**
    * Checks whether a survey belongs to the currently selected tab.
+   *
+   * @param survey - Survey to compare with the active tab.
+   * @returns Whether the survey should be visible in the active tab.
    */
   private matchesActiveTab(survey: Survey): boolean {
     if (this.activeTab() === 'active') {
@@ -208,6 +230,9 @@ export class Home {
 
   /**
    * Checks whether a survey matches the selected category filter.
+   *
+   * @param survey - Survey to compare with the selected category.
+   * @returns Whether the survey matches the selected category filter.
    */
   private matchesSelectedCategory(survey: Survey): boolean {
     return this.selectedCategory() === ALL_SURVEYS || survey.category === this.selectedCategory();
@@ -215,6 +240,9 @@ export class Home {
 
   /**
    * Returns a comparable timestamp for survey sorting.
+   *
+   * @param survey - Survey whose deadline should be converted.
+   * @returns Deadline timestamp or the largest safe number when no deadline exists.
    */
   private getDeadlineTime(survey: Survey): number {
     if (!survey.deadline) {

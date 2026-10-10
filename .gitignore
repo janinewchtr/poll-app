@@ -44,3 +44,7 @@ Thumbs.db
 
 # Local npm cache used to avoid global cache permission issues
 .npm-cache/
+
+# Environment variables
+.env
+src/environments/environment.ts

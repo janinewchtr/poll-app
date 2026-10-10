@@ -11,6 +11,8 @@ const PARTICIPANT_STORAGE_KEY = 'poll-app-participant-id';
 export class ParticipantService {
   /**
    * Returns a stable browser-local participant id or creates one for first-time visitors.
+   *
+   * @returns Browser-local participant id used to identify anonymous vote submissions.
    */
   getParticipantId(): string {
     const existingId = localStorage.getItem(PARTICIPANT_STORAGE_KEY);

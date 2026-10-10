@@ -22,15 +22,16 @@ import { SURVEY_CATEGORIES } from '../../../../core/constants/survey-categories'
 import { CreateSurveyPayload } from '../../../../core/models/survey.model';
 import { SupabaseService } from '../../../../core/services/supabase.service';
 import {
-  containsLetterValidator,
-  CreateSurveyForm,
-  QuestionForm,
-  QuestionFormValue,
-  SurveyOptionPayload,
-  SurveyQuestionPayload,
-} from './create-survey-modal.helpers';
+    containsLetterValidator,
+    createQuestionForm,
+    createSurveyPayload,
+    CreateSurveyForm,
+    clearQuestionForm,
+    getMinimumDeadlineDate,
+    MAX_OPTIONS_PER_QUESTION,
+    QuestionForm,
+  } from './create-survey-modal.helpers';
 
-const MAX_OPTIONS_PER_QUESTION = 6;
 const PUBLISHED_OVERLAY_VISIBLE_MS = 3000;
 
 /**
@@ -60,7 +61,7 @@ export class CreateSurveyModal implements OnInit, OnDestroy {
   readonly createdSurveyId = signal<string | null>(null);
   readonly isCategoryMenuOpen = signal<boolean>(false);
   readonly selectedCategory = signal<string>('');
-  readonly minimumDeadlineDate = this.getMinimumDeadlineDate();
+  readonly minimumDeadlineDate = getMinimumDeadlineDate();
 
   readonly showPublishedOverlay = computed<boolean>(() => {
     return this.createdSurveyId() !== null;
@@ -75,7 +76,7 @@ export class CreateSurveyModal implements OnInit, OnDestroy {
     description: [''],
     category: ['', Validators.required],
     deadline: [''],
-    questions: this.formBuilder.array<QuestionForm>([this.createQuestion()]),
+    questions: this.formBuilder.array<QuestionForm>([createQuestionForm(this.formBuilder)]),
   });
 
   readonly questions = computed<FormArray<QuestionForm>>(() => {
@@ -84,6 +85,8 @@ export class CreateSurveyModal implements OnInit, OnDestroy {
 
   /**
    * Closes the category menu when the user clicks outside of the dropdown.
+   *
+   * @param event - Document click event used to detect outside clicks.
    */
   @HostListener('document:click', ['$event'])
   closeCategoryMenuOnOutsideClick(event: MouseEvent): void {
@@ -116,20 +119,6 @@ export class CreateSurveyModal implements OnInit, OnDestroy {
     this.document.body.style.overflow = this.previousBodyOverflow;
   }
 
-  /**
-   * Returns tomorrow's date in the yyyy-mm-dd format required by date inputs.
-   */
-  private getMinimumDeadlineDate(): string {
-    const tomorrow = new Date();
-
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    const year = tomorrow.getFullYear();
-    const month = String(tomorrow.getMonth() + 1).padStart(2, '0');
-    const day = String(tomorrow.getDate()).padStart(2, '0');
-
-    return `${year}-${month}-${day}`;
-  }
 
   /**
    * Emits the close event unless a survey is currently being submitted.
@@ -159,6 +148,8 @@ export class CreateSurveyModal implements OnInit, OnDestroy {
 
   /**
    * Toggles the category dropdown and keeps the click inside the modal control.
+   *
+   * @param event - Click event that should not bubble to the document listener.
    */
   toggleCategoryMenu(event: MouseEvent): void {
     event.stopPropagation();
@@ -167,6 +158,9 @@ export class CreateSurveyModal implements OnInit, OnDestroy {
 
   /**
    * Stores the selected category in both the signal and the reactive form.
+   *
+   * @param category - Category selected by the user.
+   * @param event - Click event that should not bubble to the document listener.
    */
   selectCategory(category: string, event: MouseEvent): void {
     event.stopPropagation();
@@ -183,17 +177,19 @@ export class CreateSurveyModal implements OnInit, OnDestroy {
    * Adds an empty question group to the survey form.
    */
   addQuestion(): void {
-    this.form.controls.questions.push(this.createQuestion());
+    this.form.controls.questions.push(createQuestionForm(this.formBuilder));
   }
 
   /**
    * Removes a question and keeps one editable question in the form.
+   *
+   * @param questionIndex - Index of the question that should be removed.
    */
   removeQuestion(questionIndex: number): void {
     const questions = this.form.controls.questions;
 
     if (questions.length === 1) {
-      this.clearQuestion(questions.at(0));
+      clearQuestionForm(questions.at(0));
       return;
     }
 
@@ -202,6 +198,8 @@ export class CreateSurveyModal implements OnInit, OnDestroy {
 
   /**
    * Adds an empty answer option when the maximum option count has not been reached.
+   *
+   * @param questionIndex - Index of the question that should receive another option.
    */
   addOption(questionIndex: number): void {
     const options = this.getOptions(questionIndex);
@@ -217,6 +215,9 @@ export class CreateSurveyModal implements OnInit, OnDestroy {
 
   /**
    * Checks whether the selected question can receive another answer option.
+   *
+   * @param questionIndex - Index of the question whose option count should be checked.
+   * @returns Whether another option can be added.
    */
   canAddOption(questionIndex: number): boolean {
     return this.getOptions(questionIndex).length < MAX_OPTIONS_PER_QUESTION;
@@ -224,6 +225,9 @@ export class CreateSurveyModal implements OnInit, OnDestroy {
 
   /**
    * Removes an answer option or clears it when the minimum option count is reached.
+   *
+   * @param questionIndex - Index of the question that owns the option.
+   * @param optionIndex - Index of the option that should be removed or cleared.
    */
   removeOption(questionIndex: number, optionIndex: number): void {
     const options = this.getOptions(questionIndex);
@@ -242,6 +246,9 @@ export class CreateSurveyModal implements OnInit, OnDestroy {
 
   /**
    * Returns the option controls for one question.
+   *
+   * @param questionIndex - Index of the question whose options should be returned.
+   * @returns Form array containing the answer option controls.
    */
   getOptions(questionIndex: number): FormArray<FormControl<string>> {
     return this.form.controls.questions.at(questionIndex).controls.options;
@@ -249,6 +256,9 @@ export class CreateSurveyModal implements OnInit, OnDestroy {
 
   /**
    * Converts an answer index into the visible letter label.
+   *
+   * @param optionIndex - Zero-based answer option index.
+   * @returns Letter label shown for the answer option.
    */
   getAnswerLetter(optionIndex: number): string {
     return String.fromCharCode(65 + optionIndex);
@@ -293,12 +303,16 @@ export class CreateSurveyModal implements OnInit, OnDestroy {
     this.isSubmitting.set(true);
     this.submitError.set(null);
 
-    const createdSurvey = await this.supabaseService.createSurvey(this.createSurveyPayload());
+    const createdSurvey = await this.supabaseService.createSurvey(
+        createSurveyPayload(this.form.getRawValue()),
+      );
     this.showPublishedOverlayFor(createdSurvey.id);
   }
 
   /**
    * Shows the published message and closes it automatically after a short delay.
+   *
+   * @param surveyId - Id of the created survey.
    */
   private showPublishedOverlayFor(surveyId: string): void {
     this.createdSurveyId.set(surveyId);
@@ -326,76 +340,5 @@ export class CreateSurveyModal implements OnInit, OnDestroy {
 
     clearTimeout(this.publishedOverlayTimeoutId);
     this.publishedOverlayTimeoutId = null;
-  }
-
-  /**
-   * Creates the default reactive form group for a new question.
-   */
-  private createQuestion(): QuestionForm {
-    return this.formBuilder.nonNullable.group({
-      text: ['', [Validators.required, containsLetterValidator()]],
-      allowMultiple: [false],
-      options: this.formBuilder.array<FormControl<string>>([
-        this.formBuilder.nonNullable.control('', [Validators.required, containsLetterValidator()]),
-        this.formBuilder.nonNullable.control('', [Validators.required, containsLetterValidator()]),
-      ]),
-    });
-  }
-
-  /**
-   * Clears the first question instead of deleting it completely.
-   */
-  private clearQuestion(question: QuestionForm): void {
-    question.controls.text.setValue('');
-    question.controls.allowMultiple.setValue(false);
-
-    question.controls.options.controls.forEach((option: FormControl<string>) => {
-      option.setValue('');
-    });
-  }
-
-  /**
-   * Builds the payload expected by the Supabase service from the form value.
-   */
-  private createSurveyPayload(): CreateSurveyPayload {
-    const formValue = this.form.getRawValue();
-
-    return {
-      title: formValue.title.trim(),
-      description: formValue.description.trim() || null,
-      category: formValue.category,
-      deadline: formValue.deadline || null,
-      status: 'published',
-      questions: formValue.questions.map((question, questionIndex) =>
-        this.createSurveyQuestion(question, questionIndex),
-      ),
-    };
-  }
-
-  /**
-   * Converts one question form value into the survey question payload.
-   */
-  private createSurveyQuestion(
-    question: QuestionFormValue,
-    questionIndex: number,
-  ): SurveyQuestionPayload {
-    return {
-      id: `q${questionIndex + 1}`,
-      text: question.text.trim(),
-      allowMultiple: question.allowMultiple,
-      options: question.options.map((option, optionIndex) =>
-        this.createSurveyOption(option, optionIndex),
-      ),
-    };
-  }
-
-  /**
-   * Converts one answer text into the survey option payload.
-   */
-  private createSurveyOption(option: string, optionIndex: number): SurveyOptionPayload {
-    return {
-      id: String.fromCharCode(97 + optionIndex),
-      text: option.trim(),
-    };
   }
 }

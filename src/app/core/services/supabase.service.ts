@@ -28,6 +28,8 @@ export class SupabaseService {
 
   /**
    * Loads all published surveys and normalizes their question data for the app.
+   *
+   * @returns Published surveys that are still visible in the app.
    */
   async getSurveys(): Promise<Survey[]> {
     const { data, error } = await this.getPublishedSurveyRows();
@@ -41,6 +43,8 @@ export class SupabaseService {
 
   /**
    * Loads published survey rows ordered by deadline.
+   *
+   * @returns Supabase query for published survey rows.
    */
   private getPublishedSurveyRows() {
     return this.client
@@ -52,6 +56,9 @@ export class SupabaseService {
 
   /**
    * Converts and filters visible survey rows.
+   *
+   * @param surveys - Survey rows loaded from Supabase.
+   * @returns Normalized surveys that are still visible.
    */
   private getVisibleSurveys(surveys: SurveyRow[]): Survey[] {
     return surveys
@@ -61,6 +68,9 @@ export class SupabaseService {
 
   /**
    * Checks whether a survey is still inside its 24-hour visibility window.
+   *
+   * @param survey - Survey to check.
+   * @returns Whether the survey should still be shown.
    */
   private isSurveyStillVisible(survey: Survey): boolean {
     const now = Date.now();
@@ -74,6 +84,9 @@ export class SupabaseService {
 
   /**
    * Loads a single survey by id and returns null when no matching survey exists.
+   *
+   * @param id - Survey id to load.
+   * @returns Matching survey or null when no survey exists.
    */
   async getSurveyById(id: string): Promise<Survey | null> {
     const { data, error } = await this.getSurveyRowById(id);
@@ -87,6 +100,9 @@ export class SupabaseService {
 
   /**
    * Loads one survey row by id from Supabase.
+   *
+   * @param id - Survey id to load.
+   * @returns Supabase query for one survey row.
    */
   private getSurveyRowById(id: string) {
     return this.client.from('surveys').select('*').eq('id', id).maybeSingle();
@@ -94,6 +110,9 @@ export class SupabaseService {
 
   /**
    * Creates a survey row in Supabase and converts the question list into a JSON string.
+   *
+   * @param payload - Survey data submitted from the create survey form.
+   * @returns Created survey normalized for the frontend.
    */
   async createSurvey(payload: CreateSurveyPayload): Promise<Survey> {
     const surveyRow: CreateSurveyRow = {
@@ -112,6 +131,9 @@ export class SupabaseService {
 
   /**
    * Loads all votes that belong to one survey.
+   *
+   * @param surveyId - Survey id whose votes should be loaded.
+   * @returns Votes submitted for the survey.
    */
   async getVotesBySurveyId(surveyId: string): Promise<SurveyVote[]> {
     const { data, error } = await this.client
@@ -129,6 +151,9 @@ export class SupabaseService {
 
   /**
    * Creates one vote entry for a survey participant.
+   *
+   * @param payload - Vote data submitted by the participant.
+   * @returns Created vote entry.
    */
   async createVote(payload: CreateVotePayload): Promise<SurveyVote> {
     const { data, error } = await this.client.from('votes').insert(payload).select().single();
@@ -142,6 +167,10 @@ export class SupabaseService {
 
   /**
    * Subscribes to realtime vote changes for one survey and calls the given callback on updates.
+   *
+   * @param surveyId - Survey id whose votes should be watched.
+   * @param onChange - Callback called when Supabase sends a vote change.
+   * @returns Supabase realtime channel subscription.
    */
   subscribeToSurveyVotes(
     surveyId: string,
@@ -155,6 +184,9 @@ export class SupabaseService {
 
   /**
    * Creates the Supabase realtime filter for one survey's votes.
+   *
+   * @param surveyId - Survey id used in the realtime filter.
+   * @returns Realtime filter configuration for Supabase vote changes.
    */
   private createVoteChangeFilter(surveyId: string) {
     return {
@@ -167,6 +199,9 @@ export class SupabaseService {
 
   /**
    * Converts a database survey row into the survey shape used by the frontend.
+   *
+   * @param survey - Survey row loaded from Supabase.
+   * @returns Normalized survey with parsed questions.
    */
   private normalizeSurvey(survey: SurveyRow): Survey {
     return {
@@ -177,6 +212,9 @@ export class SupabaseService {
 
   /**
    * Returns question data from either an already parsed array or a stored JSON string.
+   *
+   * @param questions - Question data from the survey row.
+   * @returns Parsed survey questions or an empty list.
    */
   private parseQuestions(questions: string | Survey['questions'] | null): Survey['questions'] {
     if (Array.isArray(questions)) {
@@ -192,6 +230,9 @@ export class SupabaseService {
 
   /**
    * Parses stored question JSON and falls back to an empty list when parsing fails.
+   *
+   * @param questions - Stored question JSON string.
+   * @returns Parsed survey questions or an empty list.
    */
   private parseQuestionString(questions: string): Survey['questions'] {
     try {
@@ -204,6 +245,9 @@ export class SupabaseService {
 
   /**
    * Ensures parsed question data is an array before passing it to the app.
+   *
+   * @param questions - Parsed question data with unknown shape.
+   * @returns Survey questions when the parsed data is an array, otherwise an empty list.
    */
   private getParsedQuestions(questions: unknown): Survey['questions'] {
     if (!Array.isArray(questions)) {

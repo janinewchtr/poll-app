@@ -3,9 +3,10 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
+    "set-env": "node set-env.mjs",
+    "start": "npm run set-env && ng serve",
+    "build": "node set-env.mjs --production && ng build",
+    "watch": "npm run set-env && ng build --watch --configuration development",
     "test": "ng test"
   },
   "private": true,
@@ -25,6 +26,7 @@
     "@angular/build": "^21.2.19",
     "@angular/cli": "^21.2.19",
     "@angular/compiler-cli": "^21.2.0",
+    "dotenv": "^18.0.7",
     "jsdom": "^28.0.0",
     "prettier": "^3.8.1",
     "typescript": "~5.9.2",

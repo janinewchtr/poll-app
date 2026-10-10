@@ -91,6 +91,8 @@ export class SurveyDetail implements OnDestroy {
 
   /**
    * Checks whether the survey cannot receive new answers.
+   *
+   * @returns Whether the survey is locked for new submissions.
    */
   private isSurveyLocked(): boolean {
     return this.isPastSurvey() || this.isSubmitting() || this.hasCompletedSurvey();
@@ -123,6 +125,8 @@ export class SurveyDetail implements OnDestroy {
 
   /**
    * Navigates to a newly created survey and reloads the detail page data.
+   *
+   * @param surveyId - Id of the newly created survey.
    */
   async handleSurveyCreated(surveyId: string): Promise<void> {
     this.isCreateSurveyModalOpen.set(false);
@@ -139,6 +143,9 @@ export class SurveyDetail implements OnDestroy {
 
   /**
    * Formats a deadline date for display in the survey header.
+   *
+   * @param deadline - Deadline date string or null when no deadline exists.
+   * @returns Formatted deadline label for the survey header.
    */
   formatDeadline(deadline: string | null): string {
     if (!deadline) {
@@ -154,6 +161,10 @@ export class SurveyDetail implements OnDestroy {
 
   /**
    * Checks whether a specific option is selected for one question.
+   *
+   * @param questionId - Question id that owns the option.
+   * @param optionId - Option id that should be checked.
+   * @returns Whether the option is currently selected.
    */
   isOptionSelected(questionId: string, optionId: string): boolean {
     return this.selectedAnswers()[questionId]?.includes(optionId) ?? false;
@@ -161,6 +172,10 @@ export class SurveyDetail implements OnDestroy {
 
   /**
    * Selects an answer immediately when the participant clicks or taps an option.
+   *
+   * @param question - Question whose answer should be changed.
+   * @param optionId - Option id selected by the participant.
+   * @param event - Mouse event used to prevent the default input behavior.
    */
   selectAnswer(question: SurveyQuestion, optionId: string, event: MouseEvent): void {
     event.preventDefault();
@@ -179,6 +194,9 @@ export class SurveyDetail implements OnDestroy {
 
   /**
    * Stores one selected option for a single-choice question.
+   *
+   * @param questionId - Question id whose answer should be replaced.
+   * @param optionId - Option id that should become the selected answer.
    */
   private selectSingleChoiceAnswer(questionId: string, optionId: string): void {
     this.selectedAnswers.update((currentAnswers: Record<string, string[]>) => ({
@@ -202,6 +220,9 @@ export class SurveyDetail implements OnDestroy {
 
   /**
    * Converts an option index into the visible result letter.
+   *
+   * @param optionIndex - Zero-based option index.
+   * @returns Letter shown for the option.
    */
   getOptionLabel(optionIndex: number): string {
     return String.fromCharCode(65 + optionIndex);
@@ -209,6 +230,10 @@ export class SurveyDetail implements OnDestroy {
 
   /**
    * Calculates the vote percentage for a single option.
+   *
+   * @param questionId - Question id whose results should be checked.
+   * @param optionId - Option id whose percentage should be calculated.
+   * @returns Rounded vote percentage for the option.
    */
   getVotePercentage(questionId: string, optionId: string): number {
     return calculateVotePercentage(questionId, optionId, this.votes(), this.selectedAnswers());
@@ -216,6 +241,8 @@ export class SurveyDetail implements OnDestroy {
 
   /**
    * Wraps the vote submit flow and handles loading and error state.
+   *
+   * @param surveyId - Survey id that receives the vote.
    */
   private async saveVote(surveyId: string): Promise<void> {
     try {
@@ -240,6 +267,8 @@ export class SurveyDetail implements OnDestroy {
 
   /**
    * Sends the selected answers to Supabase for one survey.
+   *
+   * @param surveyId - Survey id that receives the vote.
    */
   private async createVote(surveyId: string): Promise<void> {
     await this.supabaseService.createVote({
@@ -251,6 +280,8 @@ export class SurveyDetail implements OnDestroy {
 
   /**
    * Shows success feedback, clears answers and refreshes the vote results.
+   *
+   * @param surveyId - Survey id whose results should be refreshed.
    */
   private async handleVoteSubmitSuccess(surveyId: string): Promise<void> {
     storeCompletedSurvey(surveyId);
@@ -277,6 +308,8 @@ export class SurveyDetail implements OnDestroy {
 
   /**
    * Loads the selected survey and its vote data from Supabase.
+   *
+   * @param surveyId - Survey id that should be loaded.
    */
   private async loadSurvey(surveyId: string): Promise<void> {
     try {
@@ -290,6 +323,8 @@ export class SurveyDetail implements OnDestroy {
 
   /**
    * Loads one survey and stores it when it exists.
+   *
+   * @param surveyId - Survey id that should be loaded safely.
    */
   private async loadSurveySafely(surveyId: string): Promise<void> {
     this.startSurveyLoading();
@@ -323,6 +358,8 @@ export class SurveyDetail implements OnDestroy {
 
   /**
    * Stores the loaded survey, clears old selections and starts realtime vote updates.
+   *
+   * @param survey - Survey loaded from Supabase.
    */
   private async setLoadedSurvey(survey: Survey): Promise<void> {
     const normalizedSurvey = normalizeSurveyQuestions(survey as SurveyWithRawQuestions);
@@ -338,6 +375,8 @@ export class SurveyDetail implements OnDestroy {
 
   /**
    * Loads all submitted votes for one survey.
+   *
+   * @param surveyId - Survey id whose votes should be loaded.
    */
   private async loadVotes(surveyId: string): Promise<void> {
     const votes = await this.supabaseService.getVotesBySurveyId(surveyId);
@@ -346,6 +385,8 @@ export class SurveyDetail implements OnDestroy {
 
   /**
    * Replaces the current realtime subscription with one for the selected survey.
+   *
+   * @param surveyId - Survey id whose votes should be watched.
    */
   private subscribeToVoteChanges(surveyId: string): void {
     void this.votesSubscription?.unsubscribe();
@@ -357,6 +398,9 @@ export class SurveyDetail implements OnDestroy {
 
   /**
    * Adds or removes one option id from a multiple-choice answer.
+   *
+   * @param questionId - Question id whose selected options should be changed.
+   * @param optionId - Option id that should be toggled.
    */
   private toggleMultipleChoiceAnswer(questionId: string, optionId: string): void {
     this.selectedAnswers.update((currentAnswers: Record<string, string[]>) =>
