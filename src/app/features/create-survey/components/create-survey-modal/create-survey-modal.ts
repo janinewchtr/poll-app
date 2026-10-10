@@ -22,15 +22,15 @@ import { SURVEY_CATEGORIES } from '../../../../core/constants/survey-categories'
 import { CreateSurveyPayload } from '../../../../core/models/survey.model';
 import { SupabaseService } from '../../../../core/services/supabase.service';
 import {
-    containsLetterValidator,
-    createQuestionForm,
-    createSurveyPayload,
-    CreateSurveyForm,
-    clearQuestionForm,
-    getMinimumDeadlineDate,
-    MAX_OPTIONS_PER_QUESTION,
-    QuestionForm,
-  } from './create-survey-modal.helpers';
+  containsLetterValidator,
+  createQuestionForm,
+  createSurveyPayload,
+  CreateSurveyForm,
+  clearQuestionForm,
+  getMinimumDeadlineDate,
+  MAX_OPTIONS_PER_QUESTION,
+  QuestionForm,
+} from './create-survey-modal.helpers';
 
 const PUBLISHED_OVERLAY_VISIBLE_MS = 3000;
 
@@ -118,7 +118,6 @@ export class CreateSurveyModal implements OnInit, OnDestroy {
     this.clearPublishedOverlayTimeout();
     this.document.body.style.overflow = this.previousBodyOverflow;
   }
-
 
   /**
    * Emits the close event unless a survey is currently being submitted.
@@ -304,8 +303,8 @@ export class CreateSurveyModal implements OnInit, OnDestroy {
     this.submitError.set(null);
 
     const createdSurvey = await this.supabaseService.createSurvey(
-        createSurveyPayload(this.form.getRawValue()),
-      );
+      createSurveyPayload(this.form.getRawValue()),
+    );
     this.showPublishedOverlayFor(createdSurvey.id);
   }
 

@@ -88,7 +88,7 @@ h2 {
 
 .close-button:hover,
 .close-button:focus-visible {
-    background: color-mix(in srgb, var(--color-secondary-orange) 30%, transparent);
+  background: color-mix(in srgb, var(--color-secondary-orange) 30%, transparent);
 }
 
 .close-button span {
@@ -469,7 +469,7 @@ input {
 
 .add-question-button:hover,
 .add-question-button:focus-visible {
-    background: color-mix(in srgb, var(--color-secondary-orange) 30%, transparent);
+  background: color-mix(in srgb, var(--color-secondary-orange) 30%, transparent);
 }
 
 .add-question-button img {
@@ -730,7 +730,7 @@ button:focus-visible {
     font-size: 0;
     flex-shrink: 0;
   }
-  
+
   .close-button span {
     font-size: 36px;
   }
@@ -910,7 +910,7 @@ button:focus-visible {
     font-size: 0;
     flex-shrink: 0;
   }
-  
+
   .close-button span {
     font-size: 28px;
   }
